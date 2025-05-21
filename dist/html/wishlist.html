@@ -14,24 +14,30 @@
   <link rel="stylesheet" href="../style/global.css">
   <link rel="stylesheet" href="../style/navbar.css">
   <link rel="stylesheet" href="../style/footer.css">
-  <link rel="stylesheet" href="../style/wishlist.css">
   <link rel="stylesheet" href="../style/product-pages.css">
-  <link rel="stylesheet" href="./css/master.css">
+  <link rel="stylesheet" href="../style/wishlist.css">
 </head>
 
 <body>
     <nav id="header-container"></nav>
-    <div class="my-favourites">
+    <div class="container">
+              <div class="my-favourites">
         <h2 class="section-title">My Wishlist</h2>
         <div id="emptyWishList" class="empty-wish-list">
             <strong>Oh! Your wishlist is empty.</strong>
             <p>Sign in to save or access items you’ve already added to your shopping bag.</p>
             <button class="btn-continue-shopping" onclick="continueShopping()">Continue Shopping &#10132;</button>
         </div>
-        <div id="wishlist-items" class="wishlist-items">
+
+        <div class="products">
+            <div id="wishlist-items"  class="wishlist-items">
+
+            </div>
         </div>
     </div>
     <div id="footer-container"></div>
+    </div>
+  
     <script src="../js/loadHeaderFooter.js"></script>
     <script type="module" src="../js/wishlist.js"></script>
     

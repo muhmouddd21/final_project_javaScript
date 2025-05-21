@@ -27,6 +27,184 @@
 .btn-continue-shopping:hover{
     background-color: rgb(50, 49, 49);
 }
+.wishlist-items{
+    display: grid;  
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+}
+.image-m {
+  min-height: 300px;
+  max-height: 300px;
+  background-color: #eee;
+  border: none;
+  box-shadow: none;
+  overflow: hidden;
+  position: relative;
+  pointer-events: none;
+}
+.image-m img {
 
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+}
+
+.image-m img:hover {
+  transform: scale(1.1);
+  overflow: hidden;
+}
+
+.image-m img.fade-out {
+  opacity: 0;
+}
+
+.image-m img:hover:not(.thumbnail) {
+  transform: scale(1.1);
+}
+
+.info {
+  min-height: 50px;
+}
+.product-title {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 5px;
+  font-weight: 500;
+  min-height: 20px;
+}
+.product-price {
+  margin-bottom: 10px;
+}
+
+.original-price {
+  color: #999;
+  text-decoration: line-through;
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.card-m {
+  position: relative;
+  width: 300px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-m .action-icons,
+.image-m .sizes {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  display: flex;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
+}
+
+/* Hover trigger */
+.image-m:hover .action-icons,
+.image-m:hover .sizes {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Individual icon style */
+.action-icons .icon,
+.sizes .size-elem {
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  z-index: 1001;
+}
+.action-icons .icon {
+  width: 40px;
+  height: 40px;
+}
+.sizes .size-elem {
+  width: 25px;
+  height: 25px;
+  margin-bottom: 50px;
+  font-size: 10px;
+}
+
+
+.action-icons .icon:hover,
+.sizes .size-elem:hover {
+  transform: scale(1.1);
+}
+
+.card-m .discount-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: #ff5722;
+  color: white;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+.card-m .thumbnail-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  padding: 15px;
+}
+.card-m .thumbnail-container .thumbnail {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-m .thumbnail-container .thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnail {
+  transition: border 0.2s ease;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.thumbnail:hover,
+.thumbnail:focus {
+  border: 2px solid #007bff;
+  opacity: 0.8;
+}
+
+.thumbnail:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+.image-m img,
+.action-icons,
+.action-icons * {
+  pointer-events: auto;
+}
 
 

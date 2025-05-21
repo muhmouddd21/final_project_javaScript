@@ -17,14 +17,14 @@ function getProductInFav(){
 getProductInFav();
 
 const emptyWishList = document.getElementById('emptyWishList');
-const wishlist = document.getElementById('wishlist-items');
+
 
 if (productsToPut) {
     emptyWishList.style.display = 'none';
-    wishlist.style.display = 'block';
+
 } else {
     emptyWishList.style.display = 'block';
-    wishlist.style.display = 'none';
+
 }
 
 function continueShopping() {
@@ -49,7 +49,7 @@ function buildProductCards() {
 
       let card = `
         <div class="card-m" data-product-id="${productId}">
-          <div class="image">
+          <div class="image-m">
             <img id="previewImage-${productId}" src="${croppedUrl}" />
             <div class="action-icons">
               <div class="icon shop-icon" id="shop-${productId}">
