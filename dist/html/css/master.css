@@ -285,6 +285,7 @@ object-fit: cover;
 .pop-up-overlay.open {
     opacity: 1;
     pointer-events: auto;
+    overflow: hidden;
 }
 .product-title-pop {
     font-size: 24px;

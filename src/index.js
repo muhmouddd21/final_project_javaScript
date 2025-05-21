@@ -7,22 +7,18 @@ let fav = new Set(); // Tracks favorite items
 let itemChosen = {}; // Stores currently selected item
 
 // Initialize the page with default category
-document.addEventListener('DOMContentLoaded', () => {
-    loadProducts('men-tops', 6); // Default to jackets with 5 products
+document.addEventListener('DOMContentLoaded',() => {
+     loadProducts('men-bottoms'); 
 });
 
 
 colRef = collection(db, "jackets");
 
 // Main function to load products from a category
-function loadProducts(category, noOfProducts = 5) {
+ function loadProducts(category) {
     // Get the appropriate collection reference based on category
     let colRef;
     switch(category.toLowerCase()) {
-        case 'jackets':
-            colRef = collection(db, "jackets");
-            break;
-        case 'tshirts':
         case 't-shirts':
             colRef = collection(db, "t-shirts");
             break;
@@ -40,11 +36,67 @@ function loadProducts(category, noOfProducts = 5) {
             console.error("Unknown product category");
             return;
     }
+   
+  
+    getDocs(colRef)
+    .then((snapshot) => {
+        products = []; // Reset products array
+        snapshot.docs.forEach((doc) => {
+            products.push({...doc.data(), id: doc.id});
+        });
+        
+
+        createStructureOfCards(products.length);
+        setupEventListeners(products.length);
+        populateProductData(products.length);
+        attachThumbnailHoverEvents();
+    })
+    .catch(error => {
+        console.error("Error loading products: ", error);
+    });
+}
+
+// Creates the HTML structure for product cards
+function createStructureOfCards(productsLength) {
+    let container = document.getElementById("containerOfCards");
+    // container.innerHTML = ""; // Clear existing content
+    
+    for(let i = 0; i < productsLength; i++) {
+        if (!products[i]) continue; // Skip if product doesn't exist
+       
+        let card = `
+        <div class="card-m">
+            <div class="image">
+                <img id="previewImage-${i}" />
+
+                <div class="action-icons">
+                    <div class="icon" id="shop-${i}" ><i class="fa-solid fa-cart-shopping"></i></div>
+                    <div class="icon" id="love-${i}"><i class="fa-solid fa-heart"></i></div>
+                </div>
+                <div class="sizes " id="sizes-${i}"></div>
+            </div>
+            <div class="discount-badge" id="discount-badge-${i}"></div>
+
+            <div class="info">
+                <h3 class="product-title" id="product-title-${i}"></h3>
+                <div class="product-price">
+                    <span class="original-price" id="original-price-${i}"></span>
+                    <span class="sale-price" id="sale-price-${i}"> </span>
+                </div>
+            </div>
+            <div class="thumbnail-container" id="thumbnail-container-${i}">
+            <div class="pop-up-overlay"></div>
+                <div class="pop-up" id="pop-up-shopping"></div>
+            </div>
+        </div>
+        `;
+        container.innerHTML += card;
 
     
 }
 
 // Creates the HTML structure for product cards
+
 
 
 // Sets up event listeners for all interactive elements
