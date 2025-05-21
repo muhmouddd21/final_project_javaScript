@@ -94,6 +94,7 @@ function createStructureOfCards(productsLength) {
 
     
 }
+}
 
 // Creates the HTML structure for product cards
 

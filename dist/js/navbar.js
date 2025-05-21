@@ -156,29 +156,19 @@ function renderItems() {
         </div>
       </div>
     `;
-    attachEventListnerToDeleteButtons(item);
+
 
     container.innerHTML += itemHTML;
   }
 
   calculateTotal();
 
-  attachQuantityListeners(item);
+
+  attachQuantityListeners();
  
 }
 
-function attachEventListnerToDeleteButtons(item){
-  console.log(item.id);
-  
-}
 
-console.log(arrCartItems);
-
-
-document.addEventListener("click",deleteItemOfCart)
-function deleteItemOfCart(){
-  
-}
 function attachQuantityListeners() {
   const increaseButtons = document.querySelectorAll('.increase-btn');
   const decreaseButtons = document.querySelectorAll('.decrease-btn');
@@ -225,6 +215,32 @@ function calculateTotal() {
 
 renderItems();
 
+
+function addingEventListenersToDeleteButtons(arrCartItems){
+  for(let i=0; i< arrCartItems.length; i++){
+    let buttonDelete =document.getElementById(`del-btn-${arrCartItems[i].id}`)
+    buttonDelete.addEventListener("click",(e)=>{
+      deletItem(e);
+    })
+  }
+  
+}
+addingEventListenersToDeleteButtons(arrCartItems);
+function deletItem(e){
+  let stringId =e.target.id;
+  let idOfElementToDelete =stringId.substring(stringId.lastIndexOf('-') + 1);
+  
+  if(idExistsInArray(idOfElementToDelete,arrCartItems)){
+      for(let i=0; i<arrCartItems.length; i++){
+        if(arrCartItems[i].id ===idOfElementToDelete){
+          arrCartItems.splice(i,1);
+        }
+      }
+      renderItems();
+      hasItems();
+  }
+  
+}
 
 
 
