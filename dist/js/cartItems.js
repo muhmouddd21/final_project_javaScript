@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <span class="colors-label">COLORS AVAILABLE</span>
       <div class="colors-product-pop" id="colors-product-pop-${productId}"></div>
       <div class="color-section">
-        <div class="size-option"><span class="size-label">SIZES AVAILABLE</span></div>
+        <div class="size-title"><span class="size-label">SIZES AVAILABLE</span></div>
         <div class="sizes" id="sizes-pop-up-${productId}"></div>
       </div>
       <button class="add-to-cart" id="add-to-cart-pop-${productId}">ADD TO CART</button>
