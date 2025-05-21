@@ -1,11 +1,11 @@
- import {initializeApp} from 'firebase/app'
+ import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'
  import{
     getFirestore,collection,getDocs,addDoc
- } from 'firebase/firestore'
+ } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const firebaseConfig = {
 
-  apiKey: "AIzaSyBKwseko7JItznt37s6Ed8MX46qD0Nu8Sk",
+  apiKey: "AIzaSyBKwseko7JI tznt37s6Ed8MX46qD0Nu8Sk",
   authDomain: "jsproj-group.firebaseapp.com",
   projectId: "jsproj-group",
   storageBucket: "jsproj-group.firebasestorage.app",
