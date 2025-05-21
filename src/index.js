@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProducts('men-tops', 6); // Default to jackets with 5 products
 });
 
+
+colRef = collection(db, "jackets");
+
 // Main function to load products from a category
 function loadProducts(category, noOfProducts = 5) {
     // Get the appropriate collection reference based on category
@@ -38,80 +41,16 @@ function loadProducts(category, noOfProducts = 5) {
             return;
     }
 
-    getDocs(colRef)
-    .then((snapshot) => {
-        products = []; // Reset products array
-        snapshot.docs.forEach((doc) => {
-            products.push({...doc.data(), id: doc.id});
-        });
-        
-        console.log(products);
-        createStructureOfCards(noOfProducts);
-        setupEventListeners(noOfProducts);
-        populateProductData(noOfProducts);
-        attachThumbnailHoverEvents();
-    })
-    .catch(error => {
-        console.error("Error loading products: ", error);
-    });
+    
 }
 
 // Creates the HTML structure for product cards
-function createStructureOfCards(noOfProducts) {
-    let container = document.getElementById("containerOfCards");
-    container.innerHTML = ""; // Clear existing content
-    
-    for(let i = 0; i < noOfProducts; i++) {
-        if (!products[i]) continue; // Skip if product doesn't exist
-       
-        let card = `
-        <div class="card-m">
-            <div class="image">
-                <img id="previewImage-${i}" />
 
-                <div class="action-icons">
-                    <div class="icon" id="shop-${i}" ><i class="fa-solid fa-cart-shopping"></i></div>
-                    <div class="icon" id="love-${i}"><i class="fa-solid fa-heart"></i></div>
-                </div>
-                <div class="sizes " id="sizes-${i}"></div>
-            </div>
-            <div class="discount-badge" id="discount-badge-${i}"></div>
-
-            <div class="info">
-                <h3 class="product-title" id="product-title-${i}"></h3>
-                <div class="product-price">
-                    <span class="original-price" id="original-price-${i}"></span>
-                    <span class="sale-price" id="sale-price-${i}"> </span>
-                </div>
-            </div>
-            <div class="thumbnail-container" id="thumbnail-container-${i}">
-            <div class="pop-up-overlay"></div>
-                <div class="pop-up" id="pop-up-shopping"></div>
-            </div>
-        </div>
-        `;
-        container.innerHTML += card;
-
-        // Add thumbnails if they exist
-        for(let j = 1; j < products[i].url.length; j++) {
-            let thumbnailContainer = document.getElementById(`thumbnail-container-${i}`);
-            let thumbToAppend = `<img class="thumbnail" id="previewImage-${i}-${j}" >`;
-            thumbnailContainer.innerHTML += thumbToAppend; 
-        }
-
-        // Add size options
-        for(let k = 0; k < products[i].sizes.length; k++) { 
-            let sizesContainer = document.getElementById(`sizes-${i}`);
-            let sizeToAppend = `<span class="size-elem" id="size-${i}-${k}">${products[i].sizes[k]}</span>`;
-            sizesContainer.innerHTML += sizeToAppend; 
-        }
-    }
-}
 
 // Sets up event listeners for all interactive elements
-function setupEventListeners(noOfProducts) {
+function setupEventListeners() {
     // Shopping cart icon event listeners
-    for (let i = 0; i < noOfProducts; i++) {
+    for (let i = 0; i < products.length; i++) {
         const shopping = document.getElementById(`shop-${i}`);
         if (shopping) {
             shopping.addEventListener("click", (e) => {
@@ -121,9 +60,8 @@ function setupEventListeners(noOfProducts) {
             });
         }
     }
-    
     // Favorite icon event listeners
-    for (let i = 0; i < noOfProducts; i++) {
+    for (let i = 0; i < products.length; i++) {
         const favourite = document.getElementById(`love-${i}`);
         if (favourite) {
             favourite.addEventListener("click", (e) => {
@@ -136,8 +74,8 @@ function setupEventListeners(noOfProducts) {
 }
 
 // Populates product data into the cards
-function populateProductData(noOfProducts) {
-    for(let i = 0; i < noOfProducts; i++) { 
+function populateProductData() {
+    for(let i = 0; i < products.length; i++) { 
         if (!products[i]) continue;
         
         const originalUrl = products[i].url[0];
