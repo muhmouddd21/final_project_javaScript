@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded',() => {
      loadProducts('men-bottoms'); 
 });
 
+
+colRef = collection(db, "jackets");
+
 // Main function to load products from a category
  function loadProducts(category) {
     // Get the appropriate collection reference based on category
@@ -33,7 +36,8 @@ document.addEventListener('DOMContentLoaded',() => {
             console.error("Unknown product category");
             return;
     }
-
+   
+  
     getDocs(colRef)
     .then((snapshot) => {
         products = []; // Reset products array
@@ -88,26 +92,17 @@ function createStructureOfCards(productsLength) {
         `;
         container.innerHTML += card;
 
-        // Add thumbnails if they exist
-        for(let j = 1; j < products[i].url.length; j++) {
-            let thumbnailContainer = document.getElementById(`thumbnail-container-${i}`);
-            let thumbToAppend = `<img class="thumbnail" id="previewImage-${i}-${j}" >`;
-            thumbnailContainer.innerHTML += thumbToAppend; 
-        }
-
-        // Add size options
-        for(let k = 0; k < products[i].sizes.length; k++) { 
-            let sizesContainer = document.getElementById(`sizes-${i}`);
-            let sizeToAppend = `<span class="size-elem" id="size-${i}-${k}">${products[i].sizes[k]}</span>`;
-            sizesContainer.innerHTML += sizeToAppend; 
-        }
-    }
+    
 }
 
+// Creates the HTML structure for product cards
+
+
+
 // Sets up event listeners for all interactive elements
-function setupEventListeners(noOfProducts) {
+function setupEventListeners() {
     // Shopping cart icon event listeners
-    for (let i = 0; i < noOfProducts; i++) {
+    for (let i = 0; i < products.length; i++) {
         const shopping = document.getElementById(`shop-${i}`);
         if (shopping) {
             shopping.addEventListener("click", (e) => {
@@ -117,7 +112,6 @@ function setupEventListeners(noOfProducts) {
             });
         }
     }
-    
     // Favorite icon event listeners
     for (let i = 0; i < products.length; i++) {
         const favourite = document.getElementById(`love-${i}`);
@@ -132,8 +126,8 @@ function setupEventListeners(noOfProducts) {
 }
 
 // Populates product data into the cards
-function populateProductData(noOfProducts) {
-    for(let i = 0; i < noOfProducts; i++) { 
+function populateProductData() {
+    for(let i = 0; i < products.length; i++) { 
         if (!products[i]) continue;
         
         const originalUrl = products[i].url[0];
