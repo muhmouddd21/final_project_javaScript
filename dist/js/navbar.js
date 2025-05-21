@@ -13,7 +13,7 @@ const cartItems = document.querySelector(".cart-items");
 
 
 
-function openCart() {
+ function openCart() { 
     cartPanel.classList.add("open");
     cartOverlay.classList.add("show");
 
@@ -145,7 +145,7 @@ function renderItems() {
             <span class="discounted">LE ${discountedPrice.toFixed(2)}</span>
           </p>
           <div class="item-controls">
-            <button class="delete-btn">🗑</button>
+            <button class="delete-btn" id="del-btn-${item.id}" >🗑</button>
             <div class="quantity-box">
               <button class="decrease-btn" data-id="${item.id}">-</button>
               <span class="quantity-display">${item.quantity}</span>
@@ -156,15 +156,29 @@ function renderItems() {
         </div>
       </div>
     `;
+    attachEventListnerToDeleteButtons(item);
 
     container.innerHTML += itemHTML;
   }
 
   calculateTotal();
 
-  attachQuantityListeners();
+  attachQuantityListeners(item);
+ 
 }
 
+function attachEventListnerToDeleteButtons(item){
+  console.log(item.id);
+  
+}
+
+console.log(arrCartItems);
+
+
+document.addEventListener("click",deleteItemOfCart)
+function deleteItemOfCart(){
+  
+}
 function attachQuantityListeners() {
   const increaseButtons = document.querySelectorAll('.increase-btn');
   const decreaseButtons = document.querySelectorAll('.decrease-btn');

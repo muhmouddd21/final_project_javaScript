@@ -7,19 +7,15 @@ let fav = new Set(); // Tracks favorite items
 let itemChosen = {}; // Stores currently selected item
 
 // Initialize the page with default category
-document.addEventListener('DOMContentLoaded', () => {
-    loadProducts('men-tops', 6); // Default to jackets with 5 products
+document.addEventListener('DOMContentLoaded',() => {
+     loadProducts('men-bottoms'); 
 });
 
 // Main function to load products from a category
-function loadProducts(category, noOfProducts = 5) {
+ function loadProducts(category) {
     // Get the appropriate collection reference based on category
     let colRef;
     switch(category.toLowerCase()) {
-        case 'jackets':
-            colRef = collection(db, "jackets");
-            break;
-        case 'tshirts':
         case 't-shirts':
             colRef = collection(db, "t-shirts");
             break;
@@ -45,10 +41,10 @@ function loadProducts(category, noOfProducts = 5) {
             products.push({...doc.data(), id: doc.id});
         });
         
-        console.log(products);
-        createStructureOfCards(noOfProducts);
-        setupEventListeners(noOfProducts);
-        populateProductData(noOfProducts);
+
+        createStructureOfCards(products.length);
+        setupEventListeners(products.length);
+        populateProductData(products.length);
         attachThumbnailHoverEvents();
     })
     .catch(error => {
@@ -57,11 +53,11 @@ function loadProducts(category, noOfProducts = 5) {
 }
 
 // Creates the HTML structure for product cards
-function createStructureOfCards(noOfProducts) {
+function createStructureOfCards(productsLength) {
     let container = document.getElementById("containerOfCards");
-    container.innerHTML = ""; // Clear existing content
+    // container.innerHTML = ""; // Clear existing content
     
-    for(let i = 0; i < noOfProducts; i++) {
+    for(let i = 0; i < productsLength; i++) {
         if (!products[i]) continue; // Skip if product doesn't exist
        
         let card = `
@@ -123,7 +119,7 @@ function setupEventListeners(noOfProducts) {
     }
     
     // Favorite icon event listeners
-    for (let i = 0; i < noOfProducts; i++) {
+    for (let i = 0; i < products.length; i++) {
         const favourite = document.getElementById(`love-${i}`);
         if (favourite) {
             favourite.addEventListener("click", (e) => {
