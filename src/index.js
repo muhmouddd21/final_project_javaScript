@@ -89,7 +89,7 @@ function createStructureOfCards(productsLength) {
         `;
     container.innerHTML += card;
   }
-}
+
 }
 
 // Creates the HTML structure for product cards

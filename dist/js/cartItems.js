@@ -4,6 +4,7 @@ let products = [];
 let fav = [];
 let itemChosen = {};
 
+
 document.addEventListener("DOMContentLoaded", () => {
   const colRef = collection(db, "men-tops");
 
@@ -135,15 +136,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (index === -1) {
       fav.push(productId);
+      localStorage.setItem('myFavs', JSON.stringify(fav));
       iconDiv.classList.add("pressed");
       icon.classList.add("pressed-icon");
     } else {
       fav.splice(index, 1);
+      localStorage.setItem('myFavs', JSON.stringify(fav));
       iconDiv.classList.remove("pressed");
       icon.classList.remove("pressed-icon");
     }
+    
 
-    console.log(fav);
   }
 
   function addDataToPopup(productId) {
@@ -243,3 +246,5 @@ document.addEventListener("DOMContentLoaded", () => {
     return Math.round(price * (1 - discount / 100));
   }
 });
+
+

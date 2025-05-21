@@ -1,5 +1,9 @@
 //wishlist page
-const wishlistHasItems = false;
+let fav =localStorage.getItem('myFavs');
+console.log(fav);
+
+
+const wishlistHasItems = [];
 const emptyWishList = document.getElementById('emptyWishList');
 const wishlist = document.getElementById('wishlist');
 
