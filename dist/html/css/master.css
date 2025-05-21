@@ -814,3 +814,10 @@ input[type="number"] {
     height: auto;
     margin: 5px;
 }
+
+.my-favourites .wishlist-items{
+    display: grid;  
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+}
