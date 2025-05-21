@@ -3,16 +3,16 @@ import { db, collection, getDocs } from "../../src/config.js";
 let products = [];
 let fav = [];
 let itemChosen = {};
-localStorage.setItem("products",JSON.stringify(products));  
+localStorage.setItem("products", JSON.stringify(products));
 
 document.addEventListener("DOMContentLoaded", () => {
   const colRef = collection(db, "men-tops");
 
   getDocs(colRef)
     .then((snapshot) => {
-      products = snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })); 
-          
-      localStorage.setItem("products",JSON.stringify(products));                                                    
+      products = snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+
+      localStorage.setItem("products", JSON.stringify(products));
       buildProductCards();
       setupEventListeners();
     })
@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
       overlay.classList.add("open");
       addDataToPopup(productId);
     } else {
-      console.warn("Popup or overlay not found for product:", productId);
+      console.error("Popup or overlay not found for product:", productId);
     }
   }
 
@@ -138,19 +138,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (index === -1) {
       fav.push(productId);
-      localStorage.setItem('myFavs', JSON.stringify(fav));
+      localStorage.setItem("myFavs", JSON.stringify(fav));
       iconDiv.classList.add("pressed");
       icon.classList.add("pressed-icon");
     } else {
       fav.splice(index, 1);
-      localStorage.setItem('myFavs', JSON.stringify(fav));
+      localStorage.setItem("myFavs", JSON.stringify(fav));
       iconDiv.classList.remove("pressed");
       icon.classList.remove("pressed-icon");
     }
-    
-
   }
-
   function addDataToPopup(productId) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
@@ -165,32 +162,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const saving = originalPrice - salePrice;
 
     popupContainer.innerHTML = `
-      <button class="close-btn" id="close-btn-popUp-${productId}">×</button>
-      <div class="data">
-        <h3 class="product-title-pop">${product.title}</h3>
-      </div>
-      <div class="price"> 
-        <span class="original-price">${originalPrice}.00 LE</span>
-        <span class="sale-price">${salePrice}.00 LE</span>
-      </div>
-      <div class="savings">SAVE ${saving}.00 LE</div>
-      <span class="colors-label">COLORS AVAILABLE</span>
-      <div class="colors-product-pop" id="colors-product-pop-${productId}"></div>
-      <div class="color-section">
-        <div class="size-title"><span class="size-label">SIZES AVAILABLE</span></div>
-        <div class="sizes" id="sizes-pop-up-${productId}"></div>
-      </div>
-      <button class="add-to-cart" id="add-to-cart-pop-${productId}">ADD TO CART</button>
-    `;
+    <button class="close-btn" id="close-btn-popUp-${productId}">×</button>
+    <div class="data">
+      <h3 class="product-title-pop">${product.title}</h3>
+    </div>
+    <div class="price"> 
+      <span class="original-price">${originalPrice}.00 LE</span>
+      <span class="sale-price">${salePrice}.00 LE</span>
+    </div>
+    <div class="savings">SAVE ${saving}.00 LE</div>
+    <span class="colors-label">COLORS AVAILABLE</span>
+    <div class="colors-product-pop" id="colors-product-pop-${productId}"></div>
+    <div class="color-section">
+      <div class="size-title"><span class="size-label">SIZES AVAILABLE</span></div>
+      <div class="sizes" id="sizes-pop-up-${productId}"></div>
+    </div>
+    <button class="add-to-cart" id="add-to-cart-pop-${productId}">ADD TO CART</button>
+  `;
 
     // Add sizes
     const sizesContainer = document.getElementById(`sizes-pop-up-${productId}`);
     sizesContainer.innerHTML = "";
 
-    product.sizes.forEach((size) => {
+    product.sizes.forEach((size, index) => {
       const sizeDiv = document.createElement("div");
       sizeDiv.classList.add("size-option");
       sizeDiv.textContent = size;
+
+      // Select the first size by default
+      if (index === 0) sizeDiv.classList.add("selected");
 
       sizeDiv.addEventListener("click", () => {
         sizesContainer
@@ -208,11 +208,14 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     colorsContainer.innerHTML = "";
 
-    product.url.forEach((url) => {
+    product.url.forEach((url, index) => {
       const thumbnailsCropped = transformImageUrl(url, 2400, 2400);
       const img = document.createElement("img");
       img.src = thumbnailsCropped;
       img.classList.add("thumbnail-pop-image");
+
+      // Select the first image by default
+      if (index === 0) img.classList.add("active");
 
       img.addEventListener("click", () => {
         colorsContainer
@@ -228,9 +231,33 @@ document.addEventListener("DOMContentLoaded", () => {
     document
       .getElementById(`add-to-cart-pop-${productId}`)
       .addEventListener("click", () => {
+        const selectedSizeElement = document.querySelector(
+          `#sizes-pop-up-${productId} .size-option.selected`
+        );
+        const selectedImageElement = document.querySelector(
+          `#colors-product-pop-${productId} .thumbnail-pop-image.active`
+        );
+
+        if (!selectedSizeElement || !selectedImageElement) {
+          alert("Please select both a size and a color.");
+          return;
+        }
+
+        const selectedSize = selectedSizeElement.textContent;
+        const selectedImageUrl = selectedImageElement.src;
+
+        itemChosen = {
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          discount: product.discount,
+          salePrice: calculateDiscount(product.price, product.discount),
+          selectedSize,
+          selectedImageUrl,
+        };
+
         closePopup(productId);
-        itemChosen = product;
-        console.log("Item added to cart:", itemChosen);
+        console.log(itemChosen);
       });
 
     document
@@ -248,5 +275,3 @@ document.addEventListener("DOMContentLoaded", () => {
     return Math.round(price * (1 - discount / 100));
   }
 });
-
-
