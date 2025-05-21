@@ -3,14 +3,16 @@ import { db, collection, getDocs } from "../../src/config.js";
 let products = [];
 let fav = [];
 let itemChosen = {};
-
+localStorage.setItem("products",JSON.stringify(products));  
 
 document.addEventListener("DOMContentLoaded", () => {
   const colRef = collection(db, "men-tops");
 
   getDocs(colRef)
     .then((snapshot) => {
-      products = snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+      products = snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })); 
+          
+      localStorage.setItem("products",JSON.stringify(products));                                                    
       buildProductCards();
       setupEventListeners();
     })

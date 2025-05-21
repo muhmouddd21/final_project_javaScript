@@ -1,6 +1,6 @@
 //wishlist page
-let fav =localStorage.getItem('myFavs');
-console.log(fav);
+let fav = JSON.parse(localStorage.getItem('myFavs'));
+let products =JSON.parse(localStorage.getItem('products'));
 
 
 const wishlistHasItems = [];
