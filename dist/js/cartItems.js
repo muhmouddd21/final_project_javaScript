@@ -9,7 +9,7 @@ export function renderProductPage(collectionNames) {
   document.addEventListener("DOMContentLoaded", () => {
     const collectionsToLoad = Array.isArray(collectionNames)
       ? collectionNames
-      : [collectionNames]S;
+      : [collectionNames];
 
     Promise.all(collectionsToLoad.map((name) => getDocs(collection(db, name))))
       .then((snapshots) => {
