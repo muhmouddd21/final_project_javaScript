@@ -376,78 +376,77 @@
           </div>
           <div class="modal-body">
             <form id="edit-product-form">
-              <input type="hidden" id="edit-product-id" />
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="edit-product-name" class="form-label"
-                      >Product Name</label
-                    >
-                    <input
-                      type="text"
-                      class="form-control focus-ring focus-ring-dark"
-                      id="edit-product-name"
-                      required
-                    />
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="edit-product-category" class="form-label"
-                      >Category</label
-                    >
-                    <select
-                      class="form-select focus-ring focus-ring-dark"
-                      id="edit-product-category"
-                      required
-                    >
-                      <option value="">Select Category</option>
-                      <option value="Men">Men</option>
-                      <option value="Women">Women</option>
-                      <option value="New Arrivals">New Arrivals</option>
-                    </select>
-                  </div>
+            <input type="hidden" id="edit-product-id" />
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="edit-product-name" class="form-label">Product Title</label>
+                  <input type="text" class="form-control focus-ring focus-ring-dark" 
+                          id="edit-product-name" required />
                 </div>
               </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="edit-product-price" class="form-label"
-                      >Price ($)</label
-                    >
-                    <input
-                      type="number"
-                      class="form-control focus-ring focus-ring-dark"
-                      id="edit-product-price"
-                      min="0"
-                      step="0.01"
-                      required
-                    />
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="edit-product-category" class="form-label">Category</label>
+                  <select class="form-select focus-ring focus-ring-dark" 
+                          id="edit-product-category" required>
+                    <option value="">Select Category</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Sizes</label>
+                  <div class="form-control focus-ring focus-ring-dark pt-2">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" id="size-m" value="M">
+                      <label class="form-check-label" for="size-m">M</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" id="size-l" value="L">
+                      <label class="form-check-label" for="size-l">L</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" id="size-xl" value="XL">
+                      <label class="form-check-label" for="size-xl">XL</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" id="size-xxl" value="XXL">
+                      <label class="form-check-label" for="size-xxl">XXL</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" id="size-xxxl" value="XXXL">
+                      <label class="form-check-label" for="size-xxxl">XXXL</label>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="mb-3">
-                <label for="edit-product-description" class="form-label"
-                  >Description</label
-                >
-                <textarea
-                  class="form-control focus-ring focus-ring-dark"
-                  id="edit-product-description"
-                  rows="3"
-                  required
-                ></textarea>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="edit-product-price" class="form-label">Price ($)</label>
+                  <input type="number" class="form-control focus-ring focus-ring-dark"
+                          id="edit-product-price" min="0" step="0.01" required
+                          value="1233.00" />
+                </div>
               </div>
-              <div class="mb-3">
-                <label for="edit-product-image" class="form-label"
-                  >Product Image</label
-                >
-                <input
-                  type="file"
-                  class="form-control focus-ring focus-ring-dark"
-                  id="edit-product-image"
-                />
-              </div>
-            </form>
+            </div>
+
+            <div class="mb-3">
+              <label for="edit-product-images" class="form-label">Product Images</label>
+              <input type="file" class="form-control focus-ring focus-ring-dark"
+                      id="edit-product-images" multiple />
+            </div>
+          </form>
+
+
+
+
           </div>
           <div class="modal-footer">
             <button
