@@ -1,15 +1,22 @@
 import { db, collection, getDocs } from "../../src/config.js";
 
 renderProductPage(["men-tops", "women-bottoms"]);
+
 export function renderProductPage(collectionNames) {
-  let products = [];
+  const products = [];
   let fav = JSON.parse(localStorage.getItem("myFavs")) || [];
-  let itemChosen = {};
+  let itemChosen = [];
+
+  // Load previously stored chosen items
+  const storedChosenItems = localStorage.getItem("itemChosen");
+  if (storedChosenItems) {
+    itemChosen = JSON.parse(storedChosenItems);
+  }
 
   document.addEventListener("DOMContentLoaded", () => {
     const collectionsToLoad = Array.isArray(collectionNames)
       ? collectionNames
-      : [collectionNames]S;
+      : [collectionNames];
 
     Promise.all(collectionsToLoad.map((name) => getDocs(collection(db, name))))
       .then((snapshots) => {
@@ -25,158 +32,148 @@ export function renderProductPage(collectionNames) {
         buildProductCards();
         setupEventListeners();
       })
-      .catch((error) => {
-        console.error("Error loading products: ", error);
-      });
-    function buildProductCards() {
-      const container = document.getElementById("containerOfCards");
-      container.innerHTML = "";
+      .catch((error) => console.error("Error loading products:", error));
+  });
 
-      for (let i = 0; i < products.length; i++) {
-        const product = products[i];
-        const productId = product.id;
-        const croppedUrl = transformImageUrl(product.url[0], 2400, 2400);
+  function buildProductCards() {
+    const container = document.getElementById("containerOfCards");
+    container.innerHTML = "";
 
-        let card = `
-          <div class="card-m" data-product-id="${productId}">
-            <div class="image">
-              <img id="previewImage-${productId}" src="${croppedUrl}" />
-              <div class="action-icons">
-                <div class="icon shop-icon" id="shop-${productId}">
-                  <i class="fa-solid fa-cart-shopping"></i>
-                </div>
-                <div class="icon love-icon" id="love-${productId}">
-                  <i class="fa-solid fa-heart"></i>
-                </div>
+    products.forEach((product) => {
+      const { id: productId, url, sizes, discount, title, price } = product;
+      const croppedUrl = transformImageUrl(url[0], 2400, 2400);
+
+      const sizeSpans = sizes
+        .map(
+          (size, i) =>
+            `<span class="size-elem" id="size-${productId}-${i}">${size}</span>`
+        )
+        .join("");
+
+      const thumbnails = url
+        .slice(1)
+        .map(
+          (thumbUrl, j) =>
+            `<img class="thumbnail" id="previewImage-${productId}-${
+              j + 1
+            }" src="${transformImageUrl(thumbUrl, 2400, 2400)}" />`
+        )
+        .join("");
+
+      container.innerHTML += `
+        <div class="card-m" data-product-id="${productId}">
+          <div class="image">
+            <img id="previewImage-${productId}" src="${croppedUrl}" />
+            <div class="action-icons">
+              <div class="icon shop-icon" id="shop-${productId}">
+                <i class="fa-solid fa-cart-shopping"></i>
               </div>
-              <div class="sizes" id="sizes-${productId}">
-                ${product.sizes
-                  .map(
-                    (size, k) =>
-                      `<span class="size-elem" id="size-${productId}-${k}">${size}</span>`
-                  )
-                  .join("")}
-              </div>
-            </div>
-
-            <div class="discount-badge" id="discount-badge-${productId}">
-              -${product.discount}%
-            </div>
-
-            <div class="info">
-              <h3 class="product-title" id="product-title-${productId}">
-                ${product.title}
-              </h3>
-              <div class="product-price">
-                <span class="original-price" id="original-price-${productId}">
-                  LE ${product.price}.00
-                </span>
-                <span class="sale-price" id="sale-price-${productId}">
-                  LE ${calculateDiscount(product.price, product.discount)}.00
-                </span>
+              <div class="icon love-icon ${
+                fav.includes(productId) ? "pressed" : ""
+              }" id="love-${productId}">
+                <i class="fa-solid fa-heart ${
+                  fav.includes(productId) ? "pressed-icon" : ""
+                }"></i>
               </div>
             </div>
-
-            <div class="thumbnail-container" id="thumbnail-container-${productId}">
-              <div class="pop-up-overlay"></div>
-              <div class="pop-up" id="pop-up-shopping-${productId}"></div>
-              ${product.url
-                .slice(1)
-                .map((thumbUrl, j) => {
-                  const thumbCropped = transformImageUrl(thumbUrl, 2400, 2400);
-                  return `<img class="thumbnail" id="previewImage-${productId}-${
-                    j + 1
-                  }" src="${thumbCropped}" />`;
-                })
-                .join("")}
+            <div class="sizes" id="sizes-${productId}">
+              ${sizeSpans}
             </div>
           </div>
-        `;
 
-        container.innerHTML += card;
-      }
-    }
+          <div class="discount-badge" id="discount-badge-${productId}">
+            -${discount}%
+          </div>
 
-    function setupEventListeners() {
-      products.forEach((product) => {
-        const productId = product.id;
+          <div class="info">
+            <h3 class="product-title" id="product-title-${productId}">${title}</h3>
+            <div class="product-price">
+              <span class="original-price" id="original-price-${productId}">LE ${price}.00</span>
+              <span class="sale-price" id="sale-price-${productId}">LE ${calculateDiscount(
+        price,
+        discount
+      )}.00</span>
+            </div>
+          </div>
 
-        const shopping = document.getElementById(`shop-${productId}`);
-        if (shopping) {
-          shopping.addEventListener("click", () => {
-            popUpMenuForShopping(productId);
-          });
-        }
+          <div class="thumbnail-container" id="thumbnail-container-${productId}">
+            <div class="pop-up-overlay"></div>
+            <div class="pop-up" id="pop-up-shopping-${productId}"></div>
+            ${thumbnails}
+          </div>
+        </div>
+      `;
+    });
+  }
 
-        const favourite = document.getElementById(`love-${productId}`);
-        if (favourite) {
-          favourite.addEventListener("click", (e) => {
-            addToFav(productId, e);
-          });
-        }
-      });
-    }
+  function setupEventListeners() {
+    products.forEach(({ id: productId }) => {
+      const shoppingBtn = document.getElementById(`shop-${productId}`);
+      const favBtn = document.getElementById(`love-${productId}`);
 
-    function popUpMenuForShopping(productId) {
-      const popup = document.getElementById(`pop-up-shopping-${productId}`);
-      const overlay = popup?.previousElementSibling;
-
-      if (popup && overlay) {
-        popup.classList.add("open");
-        overlay.classList.add("open");
-        addDataToPopup(productId);
-      } else {
-        console.error("Popup or overlay not found for product:", productId);
-      }
-    }
-
-    function closePopup(productId) {
-      const popup = document.getElementById(`pop-up-shopping-${productId}`);
-      const overlay = popup?.previousElementSibling;
-
-      if (popup) popup.classList.remove("open");
-      if (overlay) overlay.classList.remove("open");
-    }
-
-    function addToFav(productId, e) {
-      const iconDiv = e.currentTarget;
-      const icon = iconDiv.querySelector("i");
-
-      const index = fav.indexOf(productId);
-
-      if (index === -1) {
-        fav.push(productId);
-        localStorage.setItem("myFavs", JSON.stringify(fav));
-        iconDiv.classList.add("pressed");
-        icon.classList.add("pressed-icon");
-      } else {
-        fav.splice(index, 1);
-        localStorage.setItem("myFavs", JSON.stringify(fav));
-        iconDiv.classList.remove("pressed");
-        icon.classList.remove("pressed-icon");
-      }
-    }
-
-    function addDataToPopup(productId) {
-      const product = products.find((p) => p.id === productId);
-      if (!product) return;
-
-      const popupContainer = document.getElementById(
-        `pop-up-shopping-${productId}`
+      shoppingBtn?.addEventListener("click", () =>
+        popUpMenuForShopping(productId)
       );
-      if (!popupContainer) return;
+      favBtn?.addEventListener("click", (e) => toggleFavourite(productId, e));
+    });
+  }
 
-      const salePrice = calculateDiscount(product.price, product.discount);
-      const originalPrice = product.price;
-      const saving = originalPrice - salePrice;
+  function popUpMenuForShopping(productId) {
+    const popup = document.getElementById(`pop-up-shopping-${productId}`);
+    const overlay = popup?.previousElementSibling;
 
-      popupContainer.innerHTML = `
+    if (popup && overlay) {
+      popup.classList.add("open");
+      overlay.classList.add("open");
+      renderPopupContent(productId);
+    } else {
+      console.error("Popup or overlay not found for product:", productId);
+    }
+  }
+
+  function closePopup(productId) {
+    document
+      .getElementById(`pop-up-shopping-${productId}`)
+      ?.classList.remove("open");
+    document
+      .getElementById(`pop-up-shopping-${productId}`)
+      ?.previousElementSibling?.classList.remove("open");
+  }
+
+  function toggleFavourite(productId, e) {
+    const iconDiv = e.currentTarget;
+    const icon = iconDiv.querySelector("i");
+    const index = fav.indexOf(productId);
+
+    if (index === -1) {
+      fav.push(productId);
+      iconDiv.classList.add("pressed");
+      icon.classList.add("pressed-icon");
+    } else {
+      fav.splice(index, 1);
+      iconDiv.classList.remove("pressed");
+      icon.classList.remove("pressed-icon");
+    }
+
+    localStorage.setItem("myFavs", JSON.stringify(fav));
+  }
+
+  function renderPopupContent(productId) {
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+
+    const { title, price, discount, sizes, url } = product;
+    const salePrice = calculateDiscount(price, discount);
+    const saving = price - salePrice;
+
+    const popup = document.getElementById(`pop-up-shopping-${productId}`);
+    if (!popup) return;
+
+    popup.innerHTML = `
       <button class="close-btn" id="close-btn-popUp-${productId}">×</button>
-      <div class="data">
-        <h3 class="product-title-pop">${product.title}</h3>
-      </div>
-      <div class="price"> 
-        <span class="original-price">${originalPrice}.00 LE</span>
+      <div class="data"><h3 class="product-title-pop">${title}</h3></div>
+      <div class="price">
+        <span class="original-price">${price}.00 LE</span>
         <span class="sale-price">${salePrice}.00 LE</span>
       </div>
       <div class="savings">SAVE ${saving}.00 LE</div>
@@ -189,94 +186,83 @@ export function renderProductPage(collectionNames) {
       <button class="add-to-cart" id="add-to-cart-pop-${productId}">ADD TO CART</button>
     `;
 
-      const sizesContainer = document.getElementById(
-        `sizes-pop-up-${productId}`
-      );
-      sizesContainer.innerHTML = "";
+    const sizesContainer = document.getElementById(`sizes-pop-up-${productId}`);
+    sizes.forEach((size, i) => {
+      const sizeDiv = document.createElement("div");
+      sizeDiv.classList.add("size-option");
+      sizeDiv.textContent = size;
+      if (i === 0) sizeDiv.classList.add("selected");
+      sizeDiv.addEventListener("click", () => {
+        sizesContainer
+          .querySelectorAll(".size-option")
+          .forEach((el) => el.classList.remove("selected"));
+        sizeDiv.classList.add("selected");
+      });
+      sizesContainer.appendChild(sizeDiv);
+    });
 
-      product.sizes.forEach((size, index) => {
-        const sizeDiv = document.createElement("div");
-        sizeDiv.classList.add("size-option");
-        sizeDiv.textContent = size;
-        if (index === 0) sizeDiv.classList.add("selected");
+    const colorsContainer = document.getElementById(
+      `colors-product-pop-${productId}`
+    );
+    url.forEach((imgUrl, i) => {
+      const img = document.createElement("img");
+      img.src = transformImageUrl(imgUrl, 2400, 2400);
+      img.classList.add("thumbnail-pop-image");
+      if (i === 0) img.classList.add("active");
+      img.addEventListener("click", () => {
+        colorsContainer
+          .querySelectorAll(".thumbnail-pop-image")
+          .forEach((el) => el.classList.remove("active"));
+        img.classList.add("active");
+      });
+      colorsContainer.appendChild(img);
+    });
 
-        sizeDiv.addEventListener("click", () => {
-          sizesContainer
-            .querySelectorAll(".size-option")
-            .forEach((el) => el.classList.remove("selected"));
-          sizeDiv.classList.add("selected");
-        });
+    document
+      .getElementById(`add-to-cart-pop-${productId}`)
+      .addEventListener("click", () => {
+        const selectedSize = document.querySelector(
+          `#sizes-pop-up-${productId} .size-option.selected`
+        )?.textContent;
+        const selectedImage = document.querySelector(
+          `#colors-product-pop-${productId} .thumbnail-pop-image.active`
+        )?.src;
 
-        sizesContainer.appendChild(sizeDiv);
+        if (!selectedSize || !selectedImage) {
+          alert("Please select both a size and a color.");
+          return;
+        }
+
+        const newItem = {
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          discount: product.discount,
+          salePrice,
+          selectedSize,
+          selectedImageUrl: selectedImage,
+        };
+
+        itemChosen.push(newItem);
+        localStorage.setItem("itemChosen", JSON.stringify(itemChosen));
+        console.log(itemChosen);
+
+        closePopup(productId);
       });
 
-      const colorsContainer = document.getElementById(
-        `colors-product-pop-${productId}`
-      );
-      colorsContainer.innerHTML = "";
-
-      product.url.forEach((url, index) => {
-        const thumbnailsCropped = transformImageUrl(url, 2400, 2400);
-        const img = document.createElement("img");
-        img.src = thumbnailsCropped;
-        img.classList.add("thumbnail-pop-image");
-        if (index === 0) img.classList.add("active");
-
-        img.addEventListener("click", () => {
-          colorsContainer
-            .querySelectorAll(".thumbnail-pop-image")
-            .forEach((el) => el.classList.remove("active"));
-          img.classList.add("active");
-        });
-
-        colorsContainer.appendChild(img);
+    document
+      .getElementById(`close-btn-popUp-${productId}`)
+      .addEventListener("click", () => {
+        closePopup(productId);
       });
+  }
 
-      document
-        .getElementById(`add-to-cart-pop-${productId}`)
-        .addEventListener("click", () => {
-          const selectedSizeElement = document.querySelector(
-            `#sizes-pop-up-${productId} .size-option.selected`
-          );
-          const selectedImageElement = document.querySelector(
-            `#colors-product-pop-${productId} .thumbnail-pop-image.active`
-          );
+  function transformImageUrl(url, width, height) {
+    return `${url}?width=${width}&height=${height}`;
+  }
 
-          if (!selectedSizeElement || !selectedImageElement) {
-            alert("Please select both a size and a color.");
-            return;
-          }
-
-          const selectedSize = selectedSizeElement.textContent;
-          const selectedImageUrl = selectedImageElement.src;
-
-          itemChosen = {
-            id: product.id,
-            title: product.title,
-            price: product.price,
-            discount: product.discount,
-            salePrice: calculateDiscount(product.price, product.discount),
-            selectedSize,
-            selectedImageUrl,
-          };
-
-          closePopup(productId);
-          console.log(itemChosen);
-        });
-
-      document
-        .getElementById(`close-btn-popUp-${productId}`)
-        .addEventListener("click", () => {
-          closePopup(productId);
-        });
-    }
-
-    function transformImageUrl(url, width, height) {
-      return `${url}?width=${width}&height=${height}`;
-    }
-
-    function calculateDiscount(price, discount) {
-      return Math.round(price * (1 - discount / 100));
-    }
-  });
+  function calculateDiscount(price, discount) {
+    return Math.round(price * (1 - discount / 100));
+  }
 }
+
