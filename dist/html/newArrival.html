@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="../style/navbar.css" />
     <link rel="stylesheet" href="../style/footer.css" />
     <link rel="stylesheet" href="../style/product-pages.css" />
+    <link rel="stylesheet" href="../style/master.css" />
   </head>
   <body>
     <nav id="header-container"></nav>
@@ -38,5 +39,9 @@
     </div>
     <div id="footer-container"></div>
     <script src="../js/loadHeaderFooter.js"></script>
+    <script type="module">
+      import { renderProductPage } from "../js/cartItems.js";
+      renderProductPage(["men-tops"]);
+    </script>
   </body>
 </html>
