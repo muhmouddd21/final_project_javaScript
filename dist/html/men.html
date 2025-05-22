@@ -41,6 +41,9 @@
     <div id="footer-container"></div>
 
     <script type="module" src="../js/loadHeaderFooter.js"></script>
-    <script type="module" src="../js/cartItems.js"></script>
+    <script type="module">
+      import { renderProductPage } from "../js/cartItems.js";
+      renderProductPage(["men-tops", "men-bottoms"]);
+    </script>
   </body>
 </html>
