@@ -13,8 +13,10 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/dashboard.css" />
-  </head>
+
+    <link rel="stylesheet" href="./css/dashboard.css" />
+</head>
+
   <body>
     <div class="container-fluid">
       <div class="row">
@@ -206,20 +208,28 @@
                     <thead>
                       <tr>
                         <th>ID</th>
-                        <th>Image</th>
-                        <th>Product Name</th>
-                        <th>Category</th>
+
+                        <th>Images</th>
+                        <th>Product Title</th>
+                        <th>Name Of Collection</th>
+                        <th>Sizes</th>
+
+
+                        
                         <th>Price</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
-                    <tbody id="product-table-body">
+                    <tbody id="product-table-body" class="row-data">
+
                       <!-- Products will be loaded here -->
                     </tbody>
                   </table>
                   <div id="no-products-message" class="text-center py-4 d-none">
                     <p class="text-muted">
-                      No products match your filter criteria.
+
+                      There are no products
+
                     </p>
                   </div>
                 </div>
@@ -507,6 +517,8 @@
       </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/dashborad.js"></script>
+
+    <script type="module" src="../js/dashborad.js"></script>
+
   </body>
 </html>

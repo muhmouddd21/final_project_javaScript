@@ -1,5 +1,6 @@
 import { db, collection, getDocs } from "../../src/config.js";
 
+
 function transformImageUrl(url, width, height) {
   return `${url}?width=${width}&height=${height}`;
 }
@@ -237,6 +238,7 @@ export function renderProductPage(collectionNames) {
   const products = [];
   const fav = JSON.parse(localStorage.getItem("myFavs")) || [];
 
+
   document.addEventListener("DOMContentLoaded", () => {
     const collectionsToLoad = Array.isArray(collectionNames)
       ? collectionNames
@@ -257,4 +259,6 @@ export function renderProductPage(collectionNames) {
       })
       .catch((error) => console.error("Error loading products:", error));
   });
+
 }
+

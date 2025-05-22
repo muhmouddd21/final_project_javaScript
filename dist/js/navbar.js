@@ -10,6 +10,7 @@ const closeSearch = document.querySelector(".search-panel .close-cart");
 const emptyCart = document.querySelector(".empty-cart");
 const cartItems = document.querySelector(".cart-items");
 
+
 let arrCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
 
 function updateLocalStorage() {
@@ -59,6 +60,7 @@ function addToCart(item) {
   renderItems();
 }
 
+
 function deleteItem(keyToDelete) {
   arrCartItems = arrCartItems.filter(
     (item) => generateItemKey(item) !== keyToDelete
@@ -77,12 +79,14 @@ function updateQuantity(key, change) {
     }
     updateLocalStorage();
     renderItems();
+
   }
 }
 
 function renderItems() {
   const container = document.getElementById("itemsContainer");
   container.innerHTML = "";
+
 
   arrCartItems.forEach((item) => {
     const price = Number(item.price);
@@ -91,6 +95,7 @@ function renderItems() {
 
     const itemHTML = `
       <div class="item-card" data-key="${uniqueKey}">
+
         <img src="${item.selectedImageUrl}" alt="${
       item.title
     }" class="item-image">
@@ -102,7 +107,9 @@ function renderItems() {
             <span class="discounted">LE ${salePrice.toFixed(2)}</span>
           </p>
           <div class="item-controls">
+
             <button class="delete-btn" data-key="${uniqueKey}">🗑</button>
+
             <div class="quantity-box">
               <button class="decrease-btn" data-key="${uniqueKey}">-</button>
               <span class="quantity-display">${item.quantity}</span>
@@ -112,10 +119,13 @@ function renderItems() {
         </div>
       </div>
     `;
+
+
     container.innerHTML += itemHTML;
   });
 
   calculateTotal();
+
   attachEventListeners();
   hasItems();
 }
@@ -165,12 +175,15 @@ closeSearch.addEventListener("click", closeCartPanel);
 cartOverlay.addEventListener("click", closeCartPanel);
 backToShopping.forEach((btn) => btn.addEventListener("click", closeCartPanel));
 
+
 searchButton.addEventListener("click", () => {
   searchPanel.classList.add("open");
   cartOverlay.classList.add("show");
 });
 
+
 // Dropdown Menu
+
 document.querySelectorAll(".dropbtn").forEach((btn) => {
   btn.addEventListener("click", function (e) {
     e.preventDefault();
@@ -190,7 +203,9 @@ window.addEventListener("click", function (e) {
   });
 });
 
+
 // Tab Switching
+
 document.getElementById("tab-men").addEventListener("click", () => {
   document.getElementById("tab-men").classList.add("active");
   document.getElementById("tab-women").classList.remove("active");
@@ -205,7 +220,9 @@ document.getElementById("tab-women").addEventListener("click", () => {
   document.querySelector(".category-list-men").style.display = "none";
 });
 
+
 // Mobile Menu
+
 document.getElementById("menu-toggle").addEventListener("click", () => {
   document.getElementById("menu").classList.add("open");
   cartOverlay.classList.add("show");
@@ -215,6 +232,7 @@ document.getElementById("menu-close").addEventListener("click", () => {
   document.getElementById("menu").classList.remove("open");
   cartOverlay.classList.remove("show");
 });
+
 
 // Initialize
 function initializeCart() {
@@ -229,3 +247,4 @@ function initializeCart() {
 }
 
 initializeCart();
+
