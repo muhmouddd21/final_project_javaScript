@@ -155,42 +155,25 @@ const userIcon = document.getElementById("user-icon-wrapper");
 const dropdown = document.getElementById("dropdown-content");
 const logoutBtn = document.getElementById("logout-btn");
 
-// Toggle dropdown or redirect
-if (userIcon) {
-  userIcon.addEventListener("click", (e) => {
-    e.preventDefault();
-    wrapper.classList.contains("logged-in")
-      ? dropdown.classList.toggle("show")
-      : (window.location.href = "loginForm.html");
-  });
-}
+userIcon.addEventListener("click", () => {
+  wrapper.classList.contains("logged-in")
+    ? dropdown.classList.toggle("show")
+    : (window.location.href = "loginForm.html");
+});
 
-// Auth state handler
-if (wrapper) {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      wrapper.classList.add("logged-in");
-      if (userIcon) userIcon.href = "#";
-    } else {
-      wrapper.classList.remove("logged-in");
-      if (userIcon) userIcon.href = "loginForm.html";
-      if (dropdown) dropdown.classList.remove("show");
-    }
-  });
-}
-
-// Logout handler
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    signOut(auth)
-      .then(() => (window.location.href = "index.html"))
-      .catch(console.error);
-  });
-}
-
-document.addEventListener("click", (e) => {
-  if (wrapper && !wrapper.contains(e.target) && dropdown) {
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    wrapper.classList.add("logged-in");
+    userIcon.href = "#";
+  } else {
+    wrapper.classList.remove("logged-in");
+    userIcon.href = "loginForm.html";
     dropdown.classList.remove("show");
   }
 });
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    signOut(auth).then(() => (window.location.href = "index.html"));
+  });
+}
