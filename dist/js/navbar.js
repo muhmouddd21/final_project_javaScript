@@ -10,7 +10,6 @@ const closeSearch = document.querySelector(".search-panel .close-cart");
 const emptyCart = document.querySelector(".empty-cart");
 const cartItems = document.querySelector(".cart-items");
 
-
 let arrCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
 
 function updateLocalStorage() {
@@ -60,7 +59,6 @@ function addToCart(item) {
   renderItems();
 }
 
-
 function deleteItem(keyToDelete) {
   arrCartItems = arrCartItems.filter(
     (item) => generateItemKey(item) !== keyToDelete
@@ -79,14 +77,12 @@ function updateQuantity(key, change) {
     }
     updateLocalStorage();
     renderItems();
-
   }
 }
 
 function renderItems() {
   const container = document.getElementById("itemsContainer");
   container.innerHTML = "";
-
 
   arrCartItems.forEach((item) => {
     const price = Number(item.price);
@@ -120,7 +116,6 @@ function renderItems() {
       </div>
     `;
 
-
     container.innerHTML += itemHTML;
   });
 
@@ -135,7 +130,9 @@ function calculateTotal() {
   arrCartItems.forEach((item) => {
     total += Number(item.salePrice) * item.quantity;
   });
-  document.querySelector(".total-amount").textContent = `${total.toFixed(2)}$`;
+  document.querySelector(".total-amount").textContent = `${total.toFixed(
+    2
+  )} LE`;
 }
 
 function attachEventListeners() {
@@ -175,15 +172,12 @@ closeSearch.addEventListener("click", closeCartPanel);
 cartOverlay.addEventListener("click", closeCartPanel);
 backToShopping.forEach((btn) => btn.addEventListener("click", closeCartPanel));
 
-
 searchButton.addEventListener("click", () => {
   searchPanel.classList.add("open");
   cartOverlay.classList.add("show");
 });
 
-
 // Dropdown Menu
-
 document.querySelectorAll(".dropbtn").forEach((btn) => {
   btn.addEventListener("click", function (e) {
     e.preventDefault();
@@ -203,7 +197,6 @@ window.addEventListener("click", function (e) {
   });
 });
 
-
 // Tab Switching
 
 document.getElementById("tab-men").addEventListener("click", () => {
@@ -220,7 +213,6 @@ document.getElementById("tab-women").addEventListener("click", () => {
   document.querySelector(".category-list-men").style.display = "none";
 });
 
-
 // Mobile Menu
 
 document.getElementById("menu-toggle").addEventListener("click", () => {
@@ -232,7 +224,6 @@ document.getElementById("menu-close").addEventListener("click", () => {
   document.getElementById("menu").classList.remove("open");
   cartOverlay.classList.remove("show");
 });
-
 
 // Initialize
 function initializeCart() {
@@ -247,4 +238,3 @@ function initializeCart() {
 }
 
 initializeCart();
-
