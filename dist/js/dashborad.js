@@ -22,17 +22,15 @@ async function getProductsFromDB(collectionsNames) {
      return loadProducts; 
   }
 
+let originalProducts =[];
 (async () => {
   await getProductsFromDB(collectionsNames);
+  addSortingEventListeners();
+    originalProducts = [...loadProducts];
   renderProducts(loadProducts); 
 })();
 
   
-
-
-// let products = [
-//     { id: 1, name: "Men's Casual Shirt", category: "Men", price: 49.99,description: "Comfortable casual shirt for men", image: "/api/placeholder/60/60" }
-// ];
 
 // // DOM Elements
 // const generalLink = document.getElementById('general-link');
@@ -48,7 +46,7 @@ const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 // const applyFiltersBtn = document.getElementById('apply-filters-btn');
 const noProductsMessage = document.getElementById('no-products-message');
 
-// // Navigate from general to product section
+// Navigate from general to product section
 // generalLink.addEventListener('click', function(e) {
 //     e.preventDefault();
 //     activateSection(generalSection, generalLink);
@@ -116,6 +114,142 @@ const noProductsMessage = document.getElementById('no-products-message');
     
 //     link.classList.add('active');
 // }
+let priceClicks = 0;
+let titleClicks = 0;
+
+function addSortingEventListeners() {
+    const priceButton = document.getElementById('price-column');
+    const titleButton = document.getElementById('title-column');
+    const sortSelect = document.getElementById('sort-by');
+
+    priceButton.addEventListener("click", () => {
+        resetTitleSorting();
+        priceClicks++;
+        if (priceClicks === 1) {
+            sortProductsByPrice(originalProducts, 0);
+        } else if (priceClicks === 2) {
+            sortProductsByPrice(originalProducts, 1);
+        } else {
+            sortProductsByPrice(originalProducts, 2);
+            priceClicks = 0;
+        }
+    });
+
+    titleButton.addEventListener("click", () => {
+        resetPriceSorting();
+        titleClicks++;
+        if (titleClicks === 1) {
+            sortProductsByTitle(originalProducts, 0);
+        } else if (titleClicks === 2) {
+            sortProductsByTitle(originalProducts, 1);
+        } else {
+            sortProductsByTitle(originalProducts, 2);
+            titleClicks = 0;
+        }
+    });
+
+    sortSelect.addEventListener("change", (e) => {
+        const val = e.target.value;
+
+        if (val === 'price-asc') {
+            resetTitleSorting();
+            priceClicks = 1;
+            sortProductsByPrice(originalProducts, 0);
+        } else if (val === 'price-desc') {
+            resetTitleSorting();
+            priceClicks = 2;
+            sortProductsByPrice(originalProducts, 1);
+        } else if (val === 'title-asc') {
+            resetPriceSorting();
+            titleClicks = 1;
+            sortProductsByTitle(originalProducts, 0);
+        } else if (val === 'title-desc') {
+            resetPriceSorting();
+            titleClicks = 2;
+            sortProductsByTitle(originalProducts, 1);
+        } else {
+            resetPriceSorting();
+            resetTitleSorting();
+            renderProducts(originalProducts);
+        }
+    });
+}
+
+function sortAscByPrice(products) {
+    return products.slice().sort((a, b) => a.price - b.price);
+}
+function sortDescByPrice(products) {
+    return products.slice().sort((a, b) => b.price - a.price);
+}
+function sortAscByTitle(products) {
+    return products.slice().sort((a, b) => a.title.localeCompare(b.title));
+}
+function sortDescByTitle(products) {
+    return products.slice().sort((a, b) => b.title.localeCompare(a.title));
+}
+
+function changeArrow(button, label, flag) {
+    if (flag === 0) {
+        button.innerHTML = label + ' ↑';
+    } else if (flag === 1) {
+        button.innerHTML = label + ' ↓';
+    } else {
+        button.innerHTML = label;
+    }
+}
+
+function sortProductsByPrice(products, flag) {
+    const priceButton = document.getElementById('price-column');
+    const sortSelect = document.getElementById('sort-by');
+    let sorted = [];
+
+    if (flag === 0) {
+        sorted = sortAscByPrice(products);
+        sortSelect.value = 'price-asc';
+    } else if (flag === 1) {
+        sorted = sortDescByPrice(products);
+        sortSelect.value = 'price-desc';
+    } else {
+        sorted = originalProducts;
+        sortSelect.value = 'none';
+    }
+
+    changeArrow(priceButton, 'Price', flag);
+    renderProducts(sorted);
+}
+
+function sortProductsByTitle(products, flag) {
+    const titleButton = document.getElementById('title-column');
+    const sortSelect = document.getElementById('sort-by');
+    let sorted = [];
+
+    if (flag === 0) {
+        sorted = sortAscByTitle(products);
+        sortSelect.value = 'title-asc';
+    } else if (flag === 1) {
+        sorted = sortDescByTitle(products);
+        sortSelect.value = 'title-desc';
+    } else {
+        sorted = originalProducts;
+        sortSelect.value = 'none';
+    }
+
+    changeArrow(titleButton, 'Title', flag);
+    renderProducts(sorted);
+}
+
+function resetPriceSorting() {
+    priceClicks = 0;
+    const priceButton = document.getElementById('price-column');
+    priceButton.innerHTML = 'Price';
+}
+
+function resetTitleSorting() {
+    titleClicks = 0;
+    const titleButton = document.getElementById('title-column');
+    titleButton.innerHTML = 'Title';
+}
+
 
 // Render products in table
 function renderProducts(loadProducts) {
@@ -178,6 +312,7 @@ function renderProducts(loadProducts) {
                         display: block;
                         max-width: 100%;
                         max-height: 100%;
+                        cursor:pointer;
 
             `
         })
@@ -187,6 +322,9 @@ function renderProducts(loadProducts) {
 }
 
    
+
+
+
 
 function addingEventListners(){
         document.querySelectorAll('.edit-btn').forEach(btn => {
@@ -203,6 +341,44 @@ function addingEventListners(){
             openDeleteModal(id);
         });
         })
+        let images =document.querySelectorAll('#product-table-body tr td img');
+        let targetDiv = document.getElementById("target-div-To-Show-photo");
+        [].forEach.call(images,(image)=>{
+            image.addEventListener("click",(e)=>{
+               
+                targetDiv.style.cssText=`
+                        opacity: 1;
+                        z-index: 9999;
+                        pointer-events: auto;
+                        width: 400px;
+                        height: 600px;
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center center;  
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        transition: all 0.3s ease-in-out; 
+                `;
+                targetDiv.style.backgroundImage ="url("+ e.target.src +")";
+            })
+        })
+        document.addEventListener("click",(e)=>{
+            if(e.target.tagName !== 'IMG' && e.target.id !== 'target-div-To-Show-photo'){
+      
+                targetDiv.style.cssText ='';
+            }
+            
+            
+        })  
+        document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            targetDiv.style.cssText ='';
+        }
+        });
+        
+
       
 }
 function openEditModal(productId) {
