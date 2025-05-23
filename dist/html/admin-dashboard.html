@@ -178,24 +178,17 @@
                     </select>
                   </div>
                   <div class="col-md-4">
-                    <label for="sort-by" class="form-label">Sort by:</label>
+                    <label for="sort-by"  class="form-label">Sort by:</label>
                     <select
                       class="form-select focus-ring focus-ring-dark"
                       id="sort-by"
                     >
-                      <option value="name-asc">Name (A-Z)</option>
-                      <option value="name-desc">Name (Z-A)</option>
+                    <option value="none">None</option>
+                      <option value="title-asc">Name (A-Z)</option>
+                      <option value="title-desc">Name (Z-A)</option>
                       <option value="price-asc">Price (Low to High)</option>
                       <option value="price-desc">Price (High to Low)</option>
                     </select>
-                  </div>
-                  <div class="col-md-4 d-flex align-items-end">
-                    <button
-                      id="apply-filters-btn"
-                      class="btn btn-dark add-btn mt-3 w-100"
-                    >
-                      Apply Filters
-                    </button>
                   </div>
                 </div>
               </div>
@@ -210,13 +203,13 @@
                         <th>ID</th>
 
                         <th>Images</th>
-                        <th>Product Title</th>
+                        <th id="title-column" style="cursor: pointer;"> Title</th>
                         <th>Name Of Collection</th>
                         <th>Sizes</th>
 
 
                         
-                        <th>Price</th>
+                        <th id="price-column" style="cursor: pointer;">Price</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -235,6 +228,9 @@
                 </div>
               </div>
             </div>
+                <div id="target-div-To-Show-photo" class="bigger-image">
+
+                </div>
           </div>
         </div>
       </div>
