@@ -9,11 +9,10 @@
   margin: 1rem auto 1rem;
 }
 
-.register-form{
+.register-form {
   min-width: 30rem;
   padding: 1rem;
 }
-
 
 .registration-title {
   font-size: 24px;
@@ -28,8 +27,6 @@
   position: relative;
   margin-bottom: 20px;
 }
-
-
 
 .form-input {
   width: 100%;
@@ -141,7 +138,7 @@
 .hidden {
   display: none;
 }
-/* Auth message styling */
+
 #error-message,
 #auth-message {
   display: none;
@@ -160,18 +157,15 @@
   display: block;
 }
 
-
-.register-form{
+.register-form {
   min-width: 30rem;
   padding: 1rem;
 }
 
-
-@media (max-width: 500px){
-  .register-form{
-  min-width: 0;
-  padding: 0;
-  margin: auto;
-}
-
+@media (max-width: 500px) {
+  .register-form {
+    min-width: 0;
+    padding: 0;
+    margin: auto;
+  }
 }

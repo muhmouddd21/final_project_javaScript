@@ -1,143 +1,196 @@
 import { auth } from "./firebase.js";
 import {
   createUserWithEmailAndPassword,
-  signOut,
+  updateProfile,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  sendPasswordResetEmail,
+  signOut,
+  onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
-const registerForm = document.querySelector(".register-form");
-const provider = new GoogleAuthProvider();
-const messageBox = document.getElementById("auth-message");
-
-//  Display error messages
+// Utils
 function showMessage(message, isError = true) {
-  if (!isError) return;
+  const messageBox = document.getElementById("auth-message");
+  if (!messageBox) return;
+
   messageBox.textContent = message;
-  messageBox.classList.remove("error");
-  messageBox.classList.add("error");
+  messageBox.className = "auth-message " + (isError ? "error" : "success");
   messageBox.style.display = "block";
 }
 
-//Validate email
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
-// REGISTER FORM
-registerForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const email = document.getElementById("EmailInputSign").value;
-  const password = document.getElementById("passwordInputSign").value;
+const provider = new GoogleAuthProvider();
 
-  if (!isValidEmail(email)) {
-    showMessage("Please enter a valid email.");
-    return;
-  }
-  if (password.length < 8) {
-    showMessage("Password must be at least 8 characters long.");
-    return;
-  }
+// Handle Register
+const registerForm = document.getElementById("register-form");
 
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((cred) => {
-      console.log("User registered:", cred.user);
-      registerForm.reset();
+if (registerForm) {
+  registerForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      document
-        .querySelectorAll(".register-form .form-input")
-        .forEach((input) => (input.value = ""));
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const email = document.getElementById("EmailInputSign").value.trim();
+    const password = document.getElementById("passwordInputSign").value;
 
-      document.getElementById("register-form").classList.add("hidden");
-      document.getElementById("login-form").classList.remove("hidden");
-      document.getElementById("form-title").textContent = "LOGIN";
-    })
-    .catch((error) => {
-      console.error("Registration Error:", error.message);
+    if (!isValidEmail(email)) {
+      showMessage("Please enter a valid email.");
+      return;
+    }
+
+    if (password.length < 8) {
+      showMessage("Password must be at least 8 characters.");
+      return;
+    }
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(cred.user, {
+        displayName: `${firstName} ${lastName}`,
+      });
+
+      window.location.href = "loginForm.html";
+      /*showMessage("Registration successful! Please log in.", false);*/
+    } catch (error) {
+      console.error("Registration error:", error);
       if (error.code === "auth/email-already-in-use") {
         showMessage("This email is already registered. Please log in.");
       } else {
-        showMessage("Registration failed. Please try again.");
+        showMessage("Registration failed. Try again.");
+      }
+    }
+  });
+
+  document
+    .getElementById("google-signup")
+    .addEventListener("click", async () => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const isNewUser = result._tokenResponse?.isNewUser;
+
+        if (!isNewUser) {
+          showMessage("Account already exists. Please log in.");
+          window.location.href = "loginForm.html";
+        } else {
+          window.location.href = "loginForm.html";
+        }
+      } catch (error) {
+        console.error("Google Signup Error:", error);
+        showMessage("Google sign-up failed. Try again.");
       }
     });
-});
+}
 
-// LOGIN FORM
-const login = document.getElementById("login-form");
+const loginForm = document.getElementById("login-form");
 
-login.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const email = document.getElementById("emailInputLog").value;
-  const password = document.getElementById("passwordInputLog").value;
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  signInWithEmailAndPassword(auth, email, password)
-    .then((cred) => {
-      console.log("User logged in:", cred.user);
-    })
-    .catch((err) => {
-      console.error("Login Error:", err.code);
+    const email = document.getElementById("emailInputLog").value.trim();
+    const password = document.getElementById("passwordInputLog").value;
 
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "index.html";
+    } catch (error) {
+      console.error("Login error:", error);
       if (
-        err.code === "auth/wrong-password" ||
-        err.code === "auth/user-not-found" ||
-        err.code === "auth/invalid-login-credentials"
+        error.code === "auth/wrong-password" ||
+        error.code === "auth/user-not-found"
       ) {
-        showMessage("Invalid email or password. Please try again.");
-      } else if (err.code === "auth/invalid-email") {
-        showMessage("Please enter a valid email.");
+        showMessage("Invalid email or password.");
+      } else if (error.code === "auth/invalid-email") {
+        showMessage("Invalid email format.");
       } else {
-        showMessage("Login failed. Please try again.");
+        showMessage("Login failed. Try again.");
+      }
+    }
+  });
+
+  document
+    .getElementById("google-login")
+    .addEventListener("click", async () => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        window.location.href = "index.html";
+      } catch (error) {
+        console.error("Google Login Error:", error);
+        showMessage("Google login failed. Try again.");
       }
     });
-});
 
-// GOOGLE SIGNUP
-const googleSignupButton = document.getElementById("google-signup");
+  document.getElementById("reset").addEventListener("click", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("emailInputLog").value.trim();
 
-googleSignupButton.addEventListener("click", () => {
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      const user = result.user;
-      const isNewUser = result._tokenResponse?.isNewUser;
+    if (!email) {
+      showMessage("Enter your email to reset password.");
+      return;
+    }
 
-      if (!isNewUser) {
-        console.log("Existing Google account used for sign up:", user);
-        showMessage("This account already exists. Please proceed to login.");
-      }
+    if (!isValidEmail(email)) {
+      showMessage("Enter a valid email address.");
+      return;
+    }
 
-      document.getElementById("register-form").classList.add("hidden");
-      document.getElementById("login-form").classList.remove("hidden");
-      document.getElementById("form-title").textContent = "LOGIN";
-    })
-    .catch((error) => {
-      console.error("Google Sign-in Error:", error.code);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showMessage("Password reset link sent.", false);
+    } catch (error) {
+      console.error("Reset error:", error);
+      showMessage("Error sending reset link.");
+    }
+  });
+}
 
-      if (error.code === "auth/cancelled-popup-request") {
-        showMessage("Sign-in was cancelled. Please try again.");
-      } else {
-        showMessage("Google Sign-in failed. Please try again.");
-      }
-    });
-});
+const wrapper = document.getElementById("dropdown-wrapper");
+const userIcon = document.getElementById("user-icon-wrapper");
+const dropdown = document.getElementById("dropdown-content");
+const logoutBtn = document.getElementById("logout-btn");
 
-// GOOGLE LOGIN
-const googleLoginButton = document.getElementById("google-login");
+// Toggle dropdown or redirect
+if (userIcon) {
+  userIcon.addEventListener("click", (e) => {
+    e.preventDefault();
+    wrapper.classList.contains("logged-in")
+      ? dropdown.classList.toggle("show")
+      : (window.location.href = "loginForm.html");
+  });
+}
 
-googleLoginButton.addEventListener("click", () => {
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      const user = result.user;
-      console.log("Google login:", user);
-    })
-    .catch((error) => {
-      console.error("Google Login Error:", error.code);
+// Auth state handler
+if (wrapper) {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      wrapper.classList.add("logged-in");
+      if (userIcon) userIcon.href = "#";
+    } else {
+      wrapper.classList.remove("logged-in");
+      if (userIcon) userIcon.href = "loginForm.html";
+      if (dropdown) dropdown.classList.remove("show");
+    }
+  });
+}
 
-      if (error.code === "auth/cancelled-popup-request") {
-        showMessage("Login was cancelled. Please try again.");
-      } else {
-        showMessage("Google login failed. Please try again.");
-      }
-    });
+// Logout handler
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    signOut(auth)
+      .then(() => (window.location.href = "index.html"))
+      .catch(console.error);
+  });
+}
+
+document.addEventListener("click", (e) => {
+  if (wrapper && !wrapper.contains(e.target) && dropdown) {
+    dropdown.classList.remove("show");
+  }
 });
