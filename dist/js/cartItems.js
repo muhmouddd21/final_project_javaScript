@@ -149,15 +149,15 @@ function popUpMenuForShopping(productId, products) {
   }
 }
 
-function setupEventListeners(products, fav) {
+export function setupEventListeners(products, fav) {
   products.forEach(({ id: productId }) => {
     const shoppingBtn = document.getElementById(`shop-${productId}`);
     const favBtn = document.getElementById(`love-${productId}`);
 
-    shoppingBtn?.addEventListener("click", () =>
+    shoppingBtn.addEventListener("click", () =>
       popUpMenuForShopping(productId, products)
     );
-    favBtn?.addEventListener("click", (e) =>
+    favBtn.addEventListener("click", (e) =>
       handleFavouriteToggle(productId, e, fav)
     );
   });

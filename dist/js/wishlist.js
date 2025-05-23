@@ -1,53 +1,48 @@
 //wishlist page
-let fav = JSON.parse(localStorage.getItem('myFavs'));
-let products =JSON.parse(localStorage.getItem('products'));
+let fav = JSON.parse(localStorage.getItem("myFavs"));
+let products = JSON.parse(localStorage.getItem("products"));
 
-let productsToPut =[];
-console.log(productsToPut);
+let productsToPut = [];
 
-function getProductInFav(){
-    for(let product of products){
-        for(let id of fav){
-            if(product.id == id && !productsToPut.includes(product)){
-                productsToPut.push(product);
-            }
-        }
+function getProductInFav() {
+  for (let product of products) {
+    for (let id of fav) {
+      if (product.id == id && !productsToPut.includes(product)) {
+        productsToPut.push(product);
+      }
     }
+  }
 }
 getProductInFav();
 
-const emptyWishList = document.getElementById('emptyWishList');
-
+const emptyWishList = document.getElementById("emptyWishList");
 
 if (productsToPut) {
-    emptyWishList.style.display = 'none';
-
+  emptyWishList.style.display = "none";
 } else {
-    emptyWishList.style.display = 'block';
-
+  emptyWishList.style.display = "block";
 }
 
 function continueShopping() {
-    window.location.href = 'index.html';
+  window.location.href = "index.html";
 }
 
+function transformImageUrl(url, width, height) {
+  return `${url}?width=${width}&height=${height}`;
+}
 
-  function transformImageUrl(url, width, height) {
-    return `${url}?width=${width}&height=${height}`;
-  }
-  
 function calculateDiscount(price, discount) {
-    return Math.round(price * (1 - discount / 100));
-  }
+  return Math.round(price * (1 - discount / 100));
+}
 function buildProductCards() {
-    const container = document.getElementById("wishlist-items");
-    container.innerHTML = "";
+  const container = document.getElementById("wishlist-items");
+  container.innerHTML = "";
 
-    for (let i = 0; i < productsToPut.length; i++) {
-      const productId = productsToPut[i].id;
-      const croppedUrl = transformImageUrl(productsToPut[i].url[0], 2400, 2400);
+  for (let i = 0; i < productsToPut.length; i++) {
+    const productId = productsToPut[i].id;
+    const croppedUrl = transformImageUrl(productsToPut[i].url[0], 2400, 2400);
 
-      let card = `
+    let card = `
         <div class="card-m" data-product-id="${productId}">
           <div class="image-m">
             <img id="previewImage-${productId}" src="${croppedUrl}" />
@@ -82,7 +77,10 @@ function buildProductCards() {
                 LE ${productsToPut[i].price}.00
               </span>
               <span class="sale-price" id="sale-price-${productId}">
-                LE ${calculateDiscount(productsToPut[i].price, productsToPut[i].discount)}.00
+                LE ${calculateDiscount(
+                  productsToPut[i].price,
+                  productsToPut[i].discount
+                )}.00
               </span>
             </div>
           </div>
@@ -103,7 +101,7 @@ function buildProductCards() {
         </div>
       `;
 
-      container.innerHTML += card;
-    }
+    container.innerHTML += card;
   }
-  buildProductCards();
+}
+buildProductCards();
