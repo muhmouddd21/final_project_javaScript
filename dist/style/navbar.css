@@ -483,7 +483,6 @@ nav {
 /*=========================================*/
 .icon-dropdown-wrapper {
   position: relative;
-  display: inline-block;
 }
 
 #user-icon-wrapper {
@@ -703,7 +702,7 @@ nav {
   position: absolute;
   top: 100%;
   left: 0;
-  background-color: #444;
+  background-color: #ffffff;
   display: none;
   list-style: none;
   min-width: 150px;
@@ -712,7 +711,6 @@ nav {
 .dropdown-menu li a {
   display: block;
   padding: 10px;
-  color: white;
 }
 
 .dropdown:hover .dropdown-menu {
