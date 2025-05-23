@@ -172,8 +172,6 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", () => {
-    signOut(auth).then(() => (window.location.href = "index.html"));
-  });
-}
+logoutBtn.addEventListener("click", () => {
+  signOut(auth).then(() => (window.location.href = "index.html"));
+});
