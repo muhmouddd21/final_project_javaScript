@@ -1,12 +1,12 @@
 
-import { db, collection, getDocs } from "../../src/config.js";
+import { db, collection, getDocs,deleteDoc,doc } from "../../src/config.js";
 
 
 const loadProducts = [];
 let  originalProducts =[];
  let filterProducts = [];
 
-let collectionsNames= ["men-tops", "women-bottoms"];
+let collectionsNames= ["test-mahmoud"];
 
 async function getProductsFromDB(collectionsNames) {
 
@@ -29,14 +29,17 @@ async function getProductsFromDB(collectionsNames) {
   await getProductsFromDB(collectionsNames);
   addSortingEventListeners();
   addFilteringEventListeners();
-  originalProducts = [...loadProducts]; // without any sorting i saved producted in originalProducts
-   filterProducts = [...originalProducts];
-    
+  addDeleteProductEventListener();
+  refreshProducts();
+
   renderProducts(loadProducts); 
 })();
 
 
-  
+  function refreshProducts(){
+    originalProducts = [...loadProducts]; // without any sorting i saved producted in originalProducts
+    filterProducts = [...originalProducts];
+  }
 
 // // DOM Elements
 const generalLink = document.getElementById('general-link');
@@ -428,21 +431,21 @@ function openDeleteModal(productId) {
     modal.show();
 }
 
-confirmDeleteBtn.addEventListener('click', function() {
+// confirmDeleteBtn.addEventListener('click', function() {
 
-    const productId = document.getElementById('delete-product-id').value;
+//     const productId = document.getElementById('delete-product-id').value;
    
     
-    let TobeDeleteProduct = loadProducts.filter(p => p.id === productId);
-    console.log(TobeDeleteProduct);
+//     let TobeDeleteProduct = loadProducts.filter(p => p.id === productId);
+//     console.log(TobeDeleteProduct);
     
-    filterAndSortProducts();
+//     filterAndSortProducts();
     
-    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteProductModal'));
-    modal.hide();
+//     const modal = bootstrap.Modal.getInstance(document.getElementById('deleteProductModal'));
+//     modal.hide();
     
-    showAlert('Product deleted successfully!', 'success');
-});
+//     showAlert('Product deleted successfully!', 'success');
+// });
 
 function showAlert(message, type) {
     const alertDiv = document.createElement('div');
@@ -461,47 +464,38 @@ function showAlert(message, type) {
     }, 3000);
 }
 
+function addDeleteProductEventListener(){
+    confirmDeleteBtn.addEventListener("click",()=>{
+    console.log("hey");
+    const productId = document.getElementById('delete-product-id').value;
 
-
-
-
-
-// Filter products according to selected category and sort option
-function filterAndSortProducts() {
-    const selectedCategory = filterCategorySelect.value;
-    const sortOption = sortBySelect.value;
+    let IndexToBeDeleted=0;
+    let collectionName = null;
+    loadProducts.forEach((product,I)=>{
+        if(product.id == productId){
+            IndexToBeDeleted =I;
+            collectionName = product.collectionName;
+        }
+    });
+    const refDoc= doc(db,collectionName,productId);
+    deleteDoc(refDoc)
+    .then(()=>{
+                loadProducts.splice(IndexToBeDeleted,1);
+                refreshProducts();
+                renderProducts(loadProducts);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteProductModal'));
+                modal.hide();
+    })
     
-    let filteredProducts = products;
-    if (selectedCategory && selectedCategory !== 'all') {
-        filteredProducts = products.filter(product => product.category === selectedCategory);
-    }
+
+        
+    })
     
-    filteredProducts = sortProducts(filteredProducts, sortOption);
-    
-    renderProducts(filteredProducts);
 }
-
-// // Sort products according to selected option
-// function sortProducts(productsArray, sortOption) {
-//     const sortedProducts = [...productsArray];
+// deleteProduct(){
     
-//     switch (sortOption) {
-//         case 'name-asc':
-//             sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
-//             break;
-//         case 'name-desc':
-//             sortedProducts.sort((a, b) => b.name.localeCompare(a.name));
-//             break;
-//         case 'price-asc':
-//             sortedProducts.sort((a, b) => a.price - b.price);
-//             break;
-//         case 'price-desc':
-//             sortedProducts.sort((a, b) => b.price - a.price);
-//             break;
-//     }
-    
-//     return sortedProducts;
 // }
+
 
 // // Add new product
 // saveProductBtn.addEventListener('click', function() {
@@ -632,27 +626,6 @@ function filterAndSortProducts() {
 //     renderProducts(filteredProducts);
 // }
 
-// Sort products according to selected option
-// function sortProducts(productsArray, sortOption) {
-//     const sortedProducts = [...productsArray];
-    
-//     switch (sortOption) {
-//         case 'name-asc':
-//             sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
-//             break;
-//         case 'name-desc':
-//             sortedProducts.sort((a, b) => b.name.localeCompare(a.name));
-//             break;
-//         case 'price-asc':
-//             sortedProducts.sort((a, b) => a.price - b.price);
-//             break;
-//         case 'price-desc':
-//             sortedProducts.sort((a, b) => b.price - a.price);
-//             break;
-//     }
-    
-//     return sortedProducts;
-// }
 
 // Add new product
 // saveProductBtn.addEventListener('click', function() {
