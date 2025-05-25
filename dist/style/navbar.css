@@ -140,6 +140,10 @@ nav {
   transform: translateY(-50%);
 }
 
+.cart-summary {
+  padding-bottom: 2rem;
+}
+
 .cart-panel {
   position: fixed;
   top: 0;

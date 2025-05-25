@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Page</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../style/payment.css" />
+  </head>
+  <body>
+    <div class="container payment-container">
+      <header class="text-center mb-4">
+        <h2 class="mb-1">Checkout</h2>
+        <p class="text-muted">Complete your purchase</p>
+      </header>
+
+      <div class="step-indicator">
+        <div class="step completed">
+          <div class="step-number">
+            <i class="fas fa-check"></i>
+          </div>
+          <div class="step-title">Cart</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step active">
+          <div class="step-number">2</div>
+          <div class="step-title">Payment</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-title">Confirmation</div>
+        </div>
+      </div>
+
+      <div class="row" id="payment-form">
+        <div class="col-lg-7">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">Shipping Details</h5>
+            </div>
+            <div class="card-body">
+              <form id="shipping-form">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="firstName"
+                        placeholder="First Name"
+                        required
+                      />
+                      <label for="firstName">First Name</label>
+                      <div class="invalid-feedback">
+                        Please enter your first name
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="lastName"
+                        placeholder="Last Name"
+                        required
+                      />
+                      <label for="lastName">Last Name</label>
+                      <div class="invalid-feedback">
+                        Please enter your last name
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-floating mb-3">
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        placeholder="Email"
+                        required
+                      />
+                      <label for="email">Email Address</label>
+                      <div class="invalid-feedback">
+                        Please enter a valid email address
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-floating mb-3">
+                      <input
+                        type="tel"
+                        class="form-control"
+                        id="phone"
+                        placeholder="Phone"
+                        required
+                      />
+                      <label for="phone">Phone Number</label>
+                      <div class="invalid-feedback">
+                        Please enter a valid phone number
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-floating mb-3">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="address"
+                        placeholder="Address"
+                        required
+                      />
+                      <label for="address">Street Address</label>
+                      <div class="invalid-feedback">
+                        Please enter your street address
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-floating mb-3">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="addressLine2"
+                        placeholder="Address Line 2"
+                      />
+                      <label for="addressLine2"
+                        >Apartment, Suite, etc. (optional)</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="city"
+                        placeholder="City"
+                        required
+                      />
+                      <label for="city">City</label>
+                      <div class="invalid-feedback">Please enter your city</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                      <select class="form-select" id="governorate" required>
+                        <option value="" selected disabled>
+                          Select Governorate
+                        </option>
+                        <option value="Cairo">Cairo</option>
+                        <option value="Alexandria">Alexandria</option>
+                        <option value="Giza">Giza</option>
+                        <option value="Sharm El Sheikh">Sharm El Sheikh</option>
+                        <option value="Luxor">Luxor</option>
+                        <option value="Aswan">Aswan</option>
+                        <option value="Hurghada">Hurghada</option>
+                        <option value="Port Said">Port Said</option>
+                        <option value="Suez">Suez</option>
+                        <option value="Ismailia">Ismailia</option>
+                      </select>
+                      <label for="governorate">Governorate</label>
+                      <div class="invalid-feedback">
+                        Please select your governorate
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="postalCode"
+                        placeholder="Postal Code"
+                      />
+                      <label for="postalCode">Postal Code (optional)</label>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Payment Method</h5>
+            </div>
+            <div class="card-body">
+              <div class="secure-badge">
+                <i class="fas fa-lock me-2"></i> All transactions are secure and
+                encrypted
+              </div>
+
+              <div class="payment-option selected" data-payment="cod">
+                <div class="d-flex align-items-center">
+                  <input
+                    type="radio"
+                    name="payment"
+                    id="cod"
+                    value="cod"
+                    checked
+                    class="me-2"
+                  />
+                  <label
+                    for="cod"
+                    class="mb-0 d-flex align-items-center flex-grow-1"
+                  >
+                    <i class="fas fa-money-bill-wave payment-icon"></i>
+                    <div>
+                      <strong>Cash on Delivery (COD)</strong>
+                      <p class="text-muted mb-0 small">
+                        Pay when you receive your order
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="payment-option" data-payment="stripe2">
+                <div class="d-flex align-items-center">
+                  <input
+                    type="radio"
+                    name="payment"
+                    id="stripe2"
+                    value="strip2"
+                    class="me-2"
+                  />
+                  <label
+                    for="strip2"
+                    class="mb-0 d-flex align-items-center flex-grow-1"
+                  >
+                    <i class="fas fa-money-bill-wave payment-icon"></i>
+                    <div>
+                      <strong>Pay with card</strong>
+                      <p class="text-muted mb-0 small">
+                        Pay when you receive your order
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column - Order Summary -->
+        <div class="col-lg-5">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Order Summary</h5>
+            </div>
+            <div class="card-body">
+              <div class="cart-items"></div>
+            </div>
+              <div class="order-totals mt-4 p-3"></div>
+
+              <div class="d-grid mt-4 p-4">
+                <button
+                  type="button"
+                  class="btn btn-place-order"
+                  id="place-order-btn">
+                  PLACE ORDER
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card order-success" id="order-success">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h3>Thank You for Your Order!</h3>
+        <p class="mb-4">
+          Your order has been placed successfully and will be processed soon.
+        </p>
+        <p class="mb-1">
+          <strong>Order Number:</strong>
+          <span id="order-number">FAS-12345</span>
+        </p>
+        <p class="mb-4">
+          <strong>Estimated Delivery:</strong>
+          <span id="delivery-date">May 25, 2025</span>
+        </p>
+        <button class="btn btn-primary">Continue Shopping</button>
+      </div>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="../js/payment.js"></script>
+  </body>
+</html>
+
+<!-- 
+Success                         	4242 4242 4242 4242	
+Authentication required (3D Secure)	4000 0027 6000 3184	
+Declined	                        4000 0000 0000 9995 -->
