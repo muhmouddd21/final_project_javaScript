@@ -255,9 +255,11 @@
             ></button>
           </div>
           <div class="modal-body">
+            <div id="add-product-errors" class="alert alert-danger d-none mb-0"></div>
             <form id="add-product-form">
+
               <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6"> 
                   <div class="mb-3">
                     <label for="product-name" class="form-label"
                       >Product Name</label
@@ -280,10 +282,7 @@
                       id="product-category"
                       required
                     >
-                      <option value="">Select Category</option>
-                      <option value="Men">Men</option>
-                      <option value="Women">Women</option>
-                      <option value="New Arrivals">New Arrivals</option>
+
                     </select>
                   </div>
                 </div>
@@ -305,30 +304,48 @@
                   </div>
                 </div>
               </div>
-              <div class="mb-3">
-                <label for="product-description" class="form-label"
-                  >Description</label
-                >
-                <textarea
-                  class="form-control focus-ring focus-ring-dark"
-                  id="product-description"
-                  rows="3"
-                  required
-                ></textarea>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="product-Discount" class="form-label"
+                      >Discount (%)</label
+                    >
+                    <input
+                      type="number"
+                      class="form-control focus-ring focus-ring-dark"
+                      id="product-Discount"
+                      min="0"
+                      step="0.01"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
+
+              <div class="form-group-m">
+                    <label>Sizes:</label>
+                    <div class="field-group-m" id="sizesContainer">
+                        <div class="size-item-m">
+                            <input type="text" name="sizeValue[]" placeholder="Size value (e.g., M)" value="M">
+                            <button type="button" class="remove-btn-m">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-dark add-btn mb-3" id="addSizeBtn">Add Size</button>
+                </div>
+
               <div class="mb-3">
                 <label for="product-image" class="form-label"
-                  >Product Image</label
+                  >Product Image(s)</label
                 >
-                <input
-                  type="file"
-                  class="form-control focus-ring focus-ring-dark"
-                  id="product-image"
-                />
+                <div class="field-group-m" id="ImagesContainer">
+                  </div>
+
+                </div>
+                <button type="button" class="btn btn-dark add-btn mb-3" id="addImageBtn">Add image</button>
+
+
               </div>
-            </form>
-          </div>
-          <div class="modal-footer">
+                        <div class="modal-footer">
             <button
               type="button"
               class="btn btn-secondary"
@@ -344,32 +361,42 @@
               Save Product
             </button>
           </div>
+
+       
+            </form>
+          </div>
+
         </div>
       </div>
     </div>
 
     <!-- Edit Product Modal -->
     <div
-      class="modal fade"
-      id="editProductModal"
-      tabindex="-1"
-      aria-labelledby="editProductModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
-            <button
-              type="button"
-              class="btn-close focus-ring focus-ring-dark"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <form id="edit-product-form">
+    class="modal fade"
+    id="editProductModal"
+    tabindex="-1"
+    aria-labelledby="editProductModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+          <button
+            type="button"
+            class="btn-close focus-ring focus-ring-dark"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- ERROR CONTAINER FOR EDIT FORM -->
+          <div id="edit-product-errors" class="alert alert-danger d-none mb-3"></div>
+          
+          <form id="edit-product-form">
             <input type="hidden" id="edit-product-id" />
+            <input type="hidden" id="edit-product-collection" />
+            
             <div class="row">
               <div class="col-md-6">
                 <div class="mb-3">
@@ -383,38 +410,8 @@
                   <label for="edit-product-category" class="form-label">Category</label>
                   <select class="form-select focus-ring focus-ring-dark" 
                           id="edit-product-category" required>
-                    <option value="">Select Category</option>
+                    <!-- Categories will be populated by JavaScript -->
                   </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Sizes</label>
-                  <div class="form-control focus-ring focus-ring-dark pt-2">
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="checkbox" id="size-m" value="M">
-                      <label class="form-check-label" for="size-m">M</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="checkbox" id="size-l" value="L">
-                      <label class="form-check-label" for="size-l">L</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="checkbox" id="size-xl" value="XL">
-                      <label class="form-check-label" for="size-xl">XL</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="checkbox" id="size-xxl" value="XXL">
-                      <label class="form-check-label" for="size-xxl">XXL</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="checkbox" id="size-xxxl" value="XXXL">
-                      <label class="form-check-label" for="size-xxxl">XXXL</label>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -424,42 +421,64 @@
                 <div class="mb-3">
                   <label for="edit-product-price" class="form-label">Price ($)</label>
                   <input type="number" class="form-control focus-ring focus-ring-dark"
-                          id="edit-product-price" min="0" step="0.01" required
-                          value="1233.00" />
+                          id="edit-product-price" min="0" step="0.01" required />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="edit-product-discount" class="form-label">Discount (%)</label>
+                  <input type="number" class="form-control focus-ring focus-ring-dark"
+                          id="edit-product-discount" min="0" max="100" step="0.01" required />
                 </div>
               </div>
             </div>
 
+            <!-- Dynamic Sizes Section -->
+            <div class="form-group-m">
+              <label>Sizes:</label>
+              <div class="field-group-m" id="editSizesContainer">
+                <!-- Sizes will be populated dynamically -->
+              </div>
+              <button type="button" class="btn btn-dark add-btn mb-3" id="editAddSizeBtn">Add Size</button>
+            </div>
+
+            <!-- Current Images Display -->
             <div class="mb-3">
-              <label for="edit-product-images" class="form-label">Product Images</label>
-              <input type="file" class="form-control focus-ring focus-ring-dark"
-                      id="edit-product-images" multiple />
+              <label class="form-label">Current Images:</label>
+              <div id="currentImagesContainer" class="d-flex flex-wrap gap-2 mb-3">
+                <!-- Current images will be displayed here -->
+              </div>
+            </div>
+
+            <!-- New Images Upload -->
+            <div class="mb-3">
+              <label for="edit-product-images" class="form-label">Add New Images (optional)</label>
+              <div class="field-group-m" id="editImagesContainer">
+                <!-- New image inputs will be added here -->
+              </div>
+              <button type="button" class="btn btn-dark add-btn mb-3" id="editAddImageBtn">Add New Image</button>
             </div>
           </form>
-
-
-
-
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              class="btn btn-dark add-btn"
-              id="update-product-btn"
-            >
-              Update Product
-            </button>
-          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-dark add-btn"
+            id="update-product-btn"
+          >
+            Update Product
+          </button>
         </div>
       </div>
     </div>
+  </div>
 
     <!-- Delete Confirmation Modal -->
     <div
