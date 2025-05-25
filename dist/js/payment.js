@@ -133,8 +133,7 @@ async function stripeBackend(price) {
     body: JSON.stringify({
       amount: price,
       name: "Shop",
-      secertKey:
-        "sk_test_51RQNgAFaoF7ngClnfOgObwbnWTaeuRHAE6AqNz60eKVoSk54xHOYnVEC49vQzjMH7UlN0B2s7YuMpFiUQC9FRw0700uOZ8vnAm",
+
       onSuccess: `${baseUrl}/payment/payment.html?status=success`,
       onCancel: `${baseUrl}/payment/payment.html?status=failed`,
     }),
