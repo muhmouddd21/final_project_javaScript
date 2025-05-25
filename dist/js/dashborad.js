@@ -1,12 +1,13 @@
 
-import { db, collection, getDocs,deleteDoc,doc } from "../../src/config.js";
+import { db, collection, getDocs,deleteDoc,doc,addDoc,updateDoc } from "../../src/config.js";
 
 
 const loadProducts = [];
 let  originalProducts =[];
- let filterProducts = [];
-
-let collectionsNames= ["test-mahmoud"];
+let filterProducts = [];
+let urlsUploaded=[];
+let urlMap = new Map();
+let collectionsNames= ["men-bottoms","men-tops","women-bottoms","women-tops"];
 
 async function getProductsFromDB(collectionsNames) {
 
@@ -31,7 +32,7 @@ async function getProductsFromDB(collectionsNames) {
   addFilteringEventListeners();
   addDeleteProductEventListener();
   refreshProducts();
-
+  addEventListenerforFiles();
   renderProducts(loadProducts); 
 })();
 
@@ -47,14 +48,14 @@ const productsLink = document.getElementById('products-link');
 const generalSection = document.getElementById('general-section');
 const productsSection = document.getElementById('products-section');
 const productTableBody = document.getElementById('product-table-body');
-// const saveProductBtn = document.getElementById('save-product-btn');
+const saveProductBtn = document.getElementById('save-product-btn');
 // const updateProductBtn = document.getElementById('update-product-btn');
 const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 const filterCategorySelect = document.getElementById('filter-category');
 // const sortBySelect = document.getElementById('sort-by');
 // const applyFiltersBtn = document.getElementById('apply-filters-btn');
 const noProductsMessage = document.getElementById('no-products-message');
-
+const  productCategoryInAddProduct =document.getElementById('product-category');
 
 
 // Navigate from general to product section
@@ -91,7 +92,7 @@ function activateSection(section, link) {
 
 
 function addFilteringEventListeners(){
-    addTagsFiltersByCategory();
+    addTagsFiltersByCategoryAndAddProduct();
     const filterSelect = document.getElementById('filter-category');
      filterSelect.addEventListener("change", (e) => {
          filterProducts = filterdProductsByCategory(originalProducts,e.target.value)
@@ -125,11 +126,14 @@ function filterdProductsByCategory(originalProducts,filter){
 
 
 
-function addTagsFiltersByCategory(){
+function addTagsFiltersByCategoryAndAddProduct(){
     collectionsNames.forEach((collection)=>{
             filterCategorySelect.innerHTML += `
             <option value="${collection}">${collection}</option>
-    `
+            `;
+            productCategoryInAddProduct.innerHTML += `
+            <option value="${collection}">${collection}</option>
+            `;
         
     })
 
@@ -359,6 +363,7 @@ function addingEventListners(){
             let id = this.getAttribute('data-id');
         
             openEditModal(id);
+
         });
         })
         document.querySelectorAll('.delete-btn').forEach(btn => {
@@ -408,21 +413,20 @@ function addingEventListners(){
 
       
 }
-function openEditModal(productId) {
-    const product = loadProducts.find(p => p.id === productId);
+// function openEditModal(productId) {
+//     const product = loadProducts.find(p => p.id === productId);
 
     
-    if (product) {
-        document.getElementById('edit-product-id').value = product.id;
-        document.getElementById('edit-product-name').value = product.title;
-        document.getElementById('edit-product-category').value = product.collectionName;
-        document.getElementById('edit-product-price').value = product.price;
-        // document.getElementById('edit-product-description').value = product.description;
+//     if (product) {
+//         document.getElementById('edit-product-id').value = product.id;
+//         document.getElementById('edit-product-name').value = product.title;
+//         document.getElementById('edit-product-category').value = product.collectionName;
+//         document.getElementById('edit-product-price').value = product.price;
         
-        const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
-        modal.show();
-    }
-}
+//         const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+//         modal.show();
+//     }
+// }
 function openDeleteModal(productId) {
     
     
@@ -431,21 +435,6 @@ function openDeleteModal(productId) {
     modal.show();
 }
 
-// confirmDeleteBtn.addEventListener('click', function() {
-
-//     const productId = document.getElementById('delete-product-id').value;
-   
-    
-//     let TobeDeleteProduct = loadProducts.filter(p => p.id === productId);
-//     console.log(TobeDeleteProduct);
-    
-//     filterAndSortProducts();
-    
-//     const modal = bootstrap.Modal.getInstance(document.getElementById('deleteProductModal'));
-//     modal.hide();
-    
-//     showAlert('Product deleted successfully!', 'success');
-// });
 
 function showAlert(message, type) {
     const alertDiv = document.createElement('div');
@@ -480,11 +469,13 @@ function addDeleteProductEventListener(){
     const refDoc= doc(db,collectionName,productId);
     deleteDoc(refDoc)
     .then(()=>{
+
                 loadProducts.splice(IndexToBeDeleted,1);
                 refreshProducts();
                 renderProducts(loadProducts);
                 const modal = bootstrap.Modal.getInstance(document.getElementById('deleteProductModal'));
                 modal.hide();
+                showAlert('Product deleted successfully!', 'success');
     })
     
 
@@ -492,263 +483,677 @@ function addDeleteProductEventListener(){
     })
     
 }
-// deleteProduct(){
+
+document.getElementById("addSizeBtn").addEventListener("click", function () {
+    const sizesContainer = document.getElementById("sizesContainer");
+    const sizeItem = document.createElement("div");
+    sizeItem.className = "size-item-m";
+    sizeItem.innerHTML = `
+        <input type="text" name="sizeValue[]" placeholder="Size value (e.g., M)" value="M">
+        <button type="button" class="remove-btn-m">Remove</button>
+    `;
+    sizesContainer.appendChild(sizeItem);
+});
+
+
+let imageId = 0; 
+
+document.getElementById("addImageBtn").addEventListener("click", function () {
+    const imagesContainer = document.getElementById("ImagesContainer");
+
+    const imageItem = document.createElement("div");
+    imageItem.className = "image-item-m";
+    imageItem.innerHTML = `
+        <input
+            type="file"
+            class="form-control focus-ring focus-ring-dark"
+            name="product-image[]"
+            id="img-id-${imageId}"
+            accept="image/*"
+        />
+    `;
+
+    const delButton = document.createElement("button");
+    delButton.type = "button";
+    delButton.className = "remove-btn-m-img";
+    delButton.id = `remove-btn-m-img-${imageId}`;
+    delButton.textContent = "Remove";
+
+    imageItem.appendChild(delButton);
+    imagesContainer.appendChild(imageItem);
+
+
+
+    imageId++;
+
+
     
-// }
+});
 
 
-// // Add new product
-// saveProductBtn.addEventListener('click', function() {
-//     const name = document.getElementById('product-name').value;
-//     const category = document.getElementById('product-category').value;
-//     const price = parseFloat(document.getElementById('product-price').value);
-//     const description = document.getElementById('product-description').value;
+document.addEventListener("click", function (e) {
+    if (e.target && e.target.classList.contains("remove-btn-m-img")) {
+        const parentDiv = e.target.parentElement;
+        const input = parentDiv.querySelector("input[type='file']");
+        const inputId = input ? input.id : undefined;
+
+        if (inputId && urlMap.has(inputId)) {
+            const urlToRemove = urlMap.get(inputId);
+
+            urlsUploaded = urlsUploaded.filter(url => url !== urlToRemove);
+
+            urlMap.delete(inputId);
+        }
+        console.log(urlsUploaded);
+        
+        parentDiv.remove(); 
+    }
+});
+
+let spanId=0; // for the word uploading
+function addEventListenerforFiles() {
     
-//     if (name && category && price && description) {
-//         const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-        
-//         const newProduct = {
-//             id: newId,
-//             name: name,
-//             category: category,
-//             price: price,
-//             description: description,
-//             image: "/api/placeholder/60/60"
-//         };
-        
-//         products.push(newProduct);
-//         filterAndSortProducts();
-        
-//         const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
-//         modal.hide();
-//         document.getElementById('add-product-form').reset();
+    const imagesContainer = document.getElementById("ImagesContainer");
 
-//         showAlert('Product added successfully!', 'success');
-//     } else {
-//         showAlert('Please fill all required fields!', 'danger');
-//     }
-// });
-
-// // Edit product
+    imagesContainer.addEventListener("change", function(e) {
+        if (e.target && e.target.matches("input[type='file']")) {
+            spanId++;
+            uploadImageToCloudinary(e.target.id,spanId);
+        }
+    });
+}
 
 
-// updateProductBtn.addEventListener('click', function() {
-//     const id = parseInt(document.getElementById('edit-product-id').value);
-//     const name = document.getElementById('edit-product-name').value;
-//     const category = document.getElementById('edit-product-category').value;
-//     const price = parseFloat(document.getElementById('edit-product-price').value);
-//     const description = document.getElementById('edit-product-description').value;
+
+async function uploadImageToCloudinary(idElement,currentSpanId){
+
+    const fileInput = document.getElementById(idElement);
+    let url = await uploadImage(fileInput,currentSpanId);
+  
+    if(url){
+        const sign = document.getElementById(`deliveredOrNot-${currentSpanId}`);
+        sign.innerHTML = `<i class="fa-solid fa-check" style="color: green;"></i>`;
+        urlsUploaded.push(url);
+        urlMap.set(idElement, url);
+     
+    }
+
+   
+}
+
+
+async function uploadImage(fileInput,currentSpanId) {
+
+
+    let container1 =fileInput.parentElement;
+    let span = document.createElement("span");
+    span.id =`deliveredOrNot-${currentSpanId}`;
+    span.style.paddingLeft = '10px';
+    span.innerHTML = "Uploading ...";
+    container1.appendChild(span);
+
+
+    const file = fileInput.files[0];
+
     
-//     if (name && category && price && description) {
-//         const productIndex = products.findIndex(p => p.id === id);
+    if (!file) {
+        alert("Please select a file");
+        return;
+    }
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'shoes-test'); 
+
+    try {
+        const response = await fetch('https://api.cloudinary.com/v1_1/denqwkum6/image/upload', {
+            method: 'POST',
+            body: formData
+        });
         
-//         if (productIndex !== -1) {
-//             products[productIndex] = {
-//                 ...products[productIndex],
-//                 name: name,
-//                 category: category,
-//                 price: price,
-//                 description: description
-//             };
+        if (!response.ok) throw new Error('Upload failed');
+        
+        const data = await response.json();
+        return (data.secure_url);
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert("Upload failed: " + error.message);
+    }
+}
+
+
+function initializeSaveProduct() {
+    const saveProductBtn = document.getElementById('save-product-btn');
+    
+    saveProductBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const errorContainer = document.getElementById('add-product-errors');
+        errorContainer.classList.add('d-none');
+        
+
+        const title = document.getElementById('product-name').value.trim();
+        const discountValue = document.getElementById('product-Discount').value;
+        const priceValue = document.getElementById('product-price').value;
+        const collectionN = document.getElementById('product-category').value;
+
+
+        const sizes = [];
+        document.querySelectorAll('#sizesContainer .size-item-m').forEach(item => {
+            const value = item.querySelector('input[name="sizeValue[]"]').value.trim();
+            if (value) {
+                sizes.push(value);
+            }
+        });
+        const urls = [...urlsUploaded];
+        let errors = [];
+
+        // Validation
+        if (!title) {
+            errors.push('Title is required.');
+        }
+
+        if (priceValue === '' || isNaN(priceValue) || Number(priceValue) <= 0) {
+            errors.push('Price must be a valid number greater than 0.');
+        }
+
+        const discount = Number(discountValue);
+        if (isNaN(discount) || discount < 0 || discount > 100) {
+            errors.push('Discount must be a number between 0 and 100.');
+        }
+
+        if (sizes.length === 0) {
+            errors.push('At least one size is required.');
+        }
+
+        if (urls.length === 0) {
+            errors.push('At least one image is required.');
+        }
+
+
+        if (errors.length > 0) {
+            errorContainer.innerHTML = `
+                <strong>Validation Errors:</strong>
+                <ul class="mb-0">
+                    ${errors.map(error => `<li>${error}</li>`).join('')}
+                </ul>
+            `;
+            errorContainer.classList.remove('d-none');
             
-//             filterAndSortProducts();
-           
-//             const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
-//             modal.hide();
-          
-//             showAlert('Product updated successfully!', 'success');
-//         }
-//     } else {
-//         showAlert('Please fill all required fields!', 'danger');
-//     }
-// });
+            errorContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
 
-// Delete product 
+        const formData = {
+            title: title,
+            discount: discount,
+            price: Number(priceValue),
+            sizes: sizes,
+            url: urls
+        };
+
+        const colRef = collection(db, collectionN);
+        addDoc(colRef, formData)
+            .then((docRef) => {
+                const productForm = document.getElementById("add-product-form");
+                productForm.reset();
+                urlsUploaded = [];
+                urlMap.clear();
+                loadProducts.push({ ...formData, id: docRef.id, collectionName: collectionN });
+                refreshProducts();
+                renderProducts(loadProducts);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+                modal.hide();
+                showAlert('Product added successfully!', 'success');
+            })
+            .catch((error) => {
+                errorContainer.innerHTML = `
+                    <strong>Server Error:</strong>
+                    <div class="mb-0">${error.message}</div>
+                `;
+                errorContainer.classList.remove('d-none');
+                errorContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeSaveProduct();
+});
+
+// Clearing errors 
+document.getElementById('addProductModal').addEventListener('show.bs.modal', function () {
+    document.getElementById('add-product-errors').classList.add('d-none');
+});
+
+// edit
+let editUrlsUploaded = [];
+let editUrlMap = new Map(); // if after upload an image and then delete it i need to create a map to the array editURLSUpladed to delete the link pushed 
+let editImageId = 0;
+let imagesToDelete = []; // Track images to be removed
+
+// Updated openEditModal function
+function openEditModal(productId) {
+    const product = loadProducts.find(p => p.id === productId);
+
+    if (product) {
+        // Reset edit-specific variables
+        editUrlsUploaded = [];
+        editUrlMap.clear();
+        editImageId = 0;
+        imagesToDelete = [];
+
+        // Populate basic fields
+        document.getElementById('edit-product-id').value = product.id;
+        document.getElementById('edit-product-collection').value = product.collectionName;
+        document.getElementById('edit-product-name').value = product.title;
+        document.getElementById('edit-product-category').value = product.collectionName;
+        document.getElementById('edit-product-price').value = product.price;
+        document.getElementById('edit-product-discount').value = product.discount || 0;
+
+        // Populate category options
+        populateEditCategoryOptions();
+
+        // Populate sizes
+        populateEditSizes(product.sizes);
+
+        // Display current images
+        displayCurrentImages(product.url);
+
+        // Clear any previous new image inputs and their status indicators
+        const editImagesContainer = document.getElementById('editImagesContainer');
+        editImagesContainer.innerHTML = '';
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+        modal.show();
+    }
+}
 
 
-// renderProducts();
-
-// applyFiltersBtn.addEventListener('click', filterAndSortProducts);
-
-// //----------------------------------------------------------------------------
-
-// //prevent to return back to genral page when refershing the page
-// function saveActiveSection(sectionId) {
-//     localStorage.setItem('activeSection', sectionId);
-// }
-
-// function loadActiveSection() {
-//     return localStorage.getItem('activeSection') || 'general'; // Default to general if not set
-// }
-
-// function activateSection(section, link) {
-//     document.querySelectorAll('.page-section').forEach(sec => {
-//         sec.classList.remove('active');
-//     });
+function populateEditCategoryOptions() {
+    const editCategorySelect = document.getElementById('edit-product-category');
     
-//     document.querySelectorAll('.nav-link').forEach(navLink => {
-//         navLink.classList.remove('active');
-//     });
-    
-//     section.classList.add('active');
-    
-//     link.classList.add('active');
-    
-//     if (section === generalSection) {
-//         saveActiveSection('general');
-//     } else if (section === productsSection) {
-//         saveActiveSection('products');
-//     }
-// }
+    collectionsNames.forEach((collection) => {
+        editCategorySelect.innerHTML += `
+            <option value="${collection}">${collection}</option>
+        `;
+    });
+}
 
-// document.addEventListener('DOMContentLoaded', function() {
-//     const activeSection = loadActiveSection();
-//     if (activeSection === 'products') {
-//         activateSection(productsSection, productsLink);
-//         renderProducts();
-//     } else {
-//         activateSection(generalSection, generalLink);
-//     }
-// });
+// Populate sizes in edit modal
+function populateEditSizes(sizes) {
+    const sizesContainer = document.getElementById('editSizesContainer');
+    sizesContainer.innerHTML = '';
 
-// Filter products according to selected category and sort option
-// function filterAndSortProducts() {
-//     const selectedCategory = filterCategorySelect.value;
-//     const sortOption = sortBySelect.value;
-    
-//     let filteredProducts = products;
-//     if (selectedCategory && selectedCategory !== 'all') {
-//         filteredProducts = products.filter(product => product.category === selectedCategory);
-//     }
-    
-//     filteredProducts = sortProducts(filteredProducts, sortOption);
-    
-//     renderProducts(filteredProducts);
-// }
+    sizes.forEach((size) => {
+        const sizeItem = document.createElement("div");
+        sizeItem.className = "size-item-m";
+        sizeItem.innerHTML = `
+            <input type="text" name="editSizeValue[]" placeholder="Size value" value="${size}">
+            <button type="button" class="remove-btn-m">Remove</button>
+        `;
+        sizesContainer.appendChild(sizeItem);
+    });
+}
+
+function displayCurrentImages(imageUrls) {
+    const currentImagesContainer = document.getElementById('currentImagesContainer');
+    currentImagesContainer.innerHTML = '';
+
+    imageUrls.forEach((url, index) => {
+        const imageDiv = document.createElement('div');
+        imageDiv.className = 'position-relative d-inline-block';
+        imageDiv.innerHTML = `
+            <img src="${url}" alt="Product Image" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle delete-image-btn" 
+                    style="width: 25px; height: 25px; font-size: 12px; padding: 0;" 
+                    data-url="${url}">
+                ×
+            </button>
+        `;
+        currentImagesContainer.appendChild(imageDiv);
+    });
+
+    // Add event listeners for delete buttons
+    currentImagesContainer.querySelectorAll('.delete-image-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const imageUrl = this.getAttribute('data-url');
+            toggleImageDeletion(imageUrl, this);
+        });
+    });
+}
 
 
-// Add new product
-// saveProductBtn.addEventListener('click', function() {
-//     const name = document.getElementById('product-name').value;
-//     const category = document.getElementById('product-category').value;
-//     const price = parseFloat(document.getElementById('product-price').value);
-//     const description = document.getElementById('product-description').value;
-    
-//     if (name && category && price && description) {
-//         const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+// Replace the markImageForDeletion and unmarkImageForDeletion functions with this single function:
+function toggleImageDeletion(imageUrl, button) {
+    if (imagesToDelete.includes(imageUrl)) {
+        // Unmark for deletion
+        const index = imagesToDelete.indexOf(imageUrl);
+        imagesToDelete.splice(index, 1);
+        button.parentElement.style.opacity = '1';
+        button.innerHTML = '×';
+        button.title = 'Mark for deletion';
+    } else {
+        // Mark for deletion
+        imagesToDelete.push(imageUrl);
+        button.parentElement.style.opacity = '0.5';
+        button.innerHTML = '↶';
+        button.title = 'Undo deletion';
+    }
+}
+
+// Add size functionality for edit modal
+document.getElementById("editAddSizeBtn").addEventListener("click", function () {
+    const sizesContainer = document.getElementById("editSizesContainer");
+    const sizeItem = document.createElement("div");
+    sizeItem.className = "size-item-m";
+    sizeItem.innerHTML = `
+        <input type="text" name="editSizeValue[]" placeholder="Size value (e.g., M)" value="M">
+        <button type="button" class="remove-btn-m">Remove</button>
+    `;
+    sizesContainer.appendChild(sizeItem);
+});
+
+// Add image functionality for edit modal
+document.getElementById("editAddImageBtn").addEventListener("click", function () {
+    const imagesContainer = document.getElementById("editImagesContainer");
+
+    const imageItem = document.createElement("div");
+    imageItem.className = "image-item-m";
+    imageItem.innerHTML = `
+        <input
+            type="file"
+            class="form-control focus-ring focus-ring-dark"
+            name="edit-product-image[]"
+            id="edit-img-id-${editImageId}"
+            accept="image/*"
+        />
+    `;
+
+    const delButton = document.createElement("button");
+    delButton.type = "button";
+    delButton.className = "remove-btn-m-img";
+    delButton.id = `edit-remove-btn-m-img-${editImageId}`;
+    delButton.textContent = "Remove";
+
+    imageItem.appendChild(delButton);
+    imagesContainer.appendChild(imageItem);
+
+    editImageId++;
+});
+
+// Handle file changes for edit modal
+document.getElementById("editImagesContainer").addEventListener("change", function(e) {
+    if (e.target && e.target.matches("input[type='file']")) {
+        uploadEditImageToCloudinary(e.target.id);
+    }
+});
+
+// Remove image functionality for edit modal
+document.addEventListener("click", function (e) {
+    if (e.target && e.target.classList.contains("remove-btn-m-img") && e.target.id.includes('edit-remove')) {
+        const parentDiv = e.target.parentElement;
+        const input = parentDiv.querySelector("input[type='file']");
+        const inputId = input ? input.id : undefined;
+
+        if (inputId && editUrlMap.has(inputId)) {
+            const urlToRemove = editUrlMap.get(inputId);
+            editUrlsUploaded = editUrlsUploaded.filter(url => url !== urlToRemove);
+            editUrlMap.delete(inputId);
+        }
         
-//         const newProduct = {
-//             id: newId,
-//             name: name,
-//             category: category,
-//             price: price,
-//             description: description,
-//             image: "/api/placeholder/60/60"
-//         };
+        parentDiv.remove(); 
+    }
+});
+
+// Upload image for edit modal
+async function uploadEditImageToCloudinary(idElement) {
+    const fileInput = document.getElementById(idElement);
+    
+    // Create a unique span ID for this upload
+    const currentSpanId = `edit-${editImageId}-${Date.now()}`;
+    
+    let url = await uploadImage(fileInput, currentSpanId);
+  
+    if(url) {
+        // Mark upload as complete
+        const sign = document.getElementById(`deliveredOrNot-${currentSpanId}`);
+        if (sign) {
+            sign.innerHTML = `<i class="fa-solid fa-check" style="color: green;"></i>`;
+        }
         
-//         products.push(newProduct);
-//         filterAndSortProducts();
+        editUrlsUploaded.push(url);
+        editUrlMap.set(idElement, url);
+    }
+}
+
+// Update product functionality
+function initializeUpdateProduct() {
+    const updateProductBtn = document.getElementById('update-product-btn');
+    
+    updateProductBtn.addEventListener('click', function(e) {
+        e.preventDefault();
         
-//         const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
-//         modal.hide();
-//         document.getElementById('add-product-form').reset();
-
-//         showAlert('Product added successfully!', 'success');
-//     } else {
-//         showAlert('Please fill all required fields!', 'danger');
-//     }
-// });
-
-// Edit product
-// function openEditModal(productId) {
-//     const product = products.find(p => p.id === productId);
-    
-//     if (product) {
-//         document.getElementById('edit-product-id').value = product.id;
-//         document.getElementById('edit-product-name').value = product.name;
-//         document.getElementById('edit-product-category').value = product.category;
-//         document.getElementById('edit-product-price').value = product.price;
-//         document.getElementById('edit-product-description').value = product.description;
+        const errorContainer = document.getElementById('edit-product-errors');
+        errorContainer.classList.add('d-none');
         
-//         const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
-//         modal.show();
-//     }
-// }
+        // Collect form values
+        const productId = document.getElementById('edit-product-id').value;
+        const originalCollectionName = document.getElementById('edit-product-collection').value;
+        const title = document.getElementById('edit-product-name').value.trim();
+        const newCollectionName = document.getElementById('edit-product-category').value;
+        const priceValue = document.getElementById('edit-product-price').value;
+        const discountValue = document.getElementById('edit-product-discount').value;
 
-// updateProductBtn.addEventListener('click', function() {
-//     const id = parseInt(document.getElementById('edit-product-id').value);
-//     const name = document.getElementById('edit-product-name').value;
-//     const category = document.getElementById('edit-product-category').value;
-//     const price = parseFloat(document.getElementById('edit-product-price').value);
-//     const description = document.getElementById('edit-product-description').value;
-    
-//     if (name && category && price && description) {
-//         const productIndex = products.findIndex(p => p.id === id);
+        // Collect sizes
+        const sizes = [];
+        document.querySelectorAll('#editSizesContainer .size-item-m').forEach(item => {
+            const value = item.querySelector('input[name="editSizeValue[]"]').value.trim();
+            if (value) {
+                sizes.push(value);
+            }
+        });
+
+        // Get current product to preserve existing images
+        const currentProduct = loadProducts.find(p => p.id === productId);
+        if (!currentProduct) {
+            console.error('Product not found');
+            return;
+        }
+
+        // Calculate final image URLs
+        let finalImageUrls = currentProduct.url.filter(url => !imagesToDelete.includes(url));
+        finalImageUrls = [...finalImageUrls, ...editUrlsUploaded];
+
+        let errors = [];
+
+        // Validation
+        if (!title) {
+            errors.push('Title is required.');
+        }
+
+        if (priceValue === '' || isNaN(priceValue) || Number(priceValue) <= 0) {
+            errors.push('Price must be a valid number greater than 0.');
+        }
+
+        const discount = Number(discountValue);
+        if (isNaN(discount) || discount < 0 || discount > 100) {
+            errors.push('Discount must be a number between 0 and 100.');
+        }
+
+        if (sizes.length === 0) {
+            errors.push('At least one size is required.');
+        }
+
+        if (finalImageUrls.length === 0) {
+            errors.push('At least one image is required.');
+        }
+
+        if (!newCollectionName) {
+            errors.push('Category is required.');
+        }
+
+        // Show errors if any
+        if (errors.length > 0) {
+            errorContainer.innerHTML = `
+                <strong>Validation Errors:</strong>
+                <ul class="mb-0">
+                    ${errors.map(error => `<li>${error}</li>`).join('')}
+                </ul>
+            `;
+            errorContainer.classList.remove('d-none');
+            errorContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+
+        // Prepare update data
+        const updateData = {
+            title: title,
+            discount: discount,
+            price: Number(priceValue),
+            sizes: sizes,
+            url: finalImageUrls
+        };
+
+        // Check if collection changed - if so, need to move document
+        if (originalCollectionName !== newCollectionName) {
+            // Delete from old collection and add to new collection
+            handleCollectionChange(productId, originalCollectionName, newCollectionName, updateData, errorContainer);
+        } else {
+            // Simple update in same collection
+            const docRef = doc(db, originalCollectionName, productId);
+            updateDoc(docRef, updateData)
+                .then(() => {
+                    updateLocalProductData(productId, updateData, newCollectionName);
+                    showUpdateSuccess();
+                })
+                .catch((error) => {
+                    showUpdateError(error, errorContainer);
+                });
+        }
+    });
+}
+
+// Clear errors when edit modal is shown
+document.getElementById('editProductModal').addEventListener('show.bs.modal', function () {
+    document.getElementById('edit-product-errors').classList.add('d-none');
+});
+
+// Initialize update product functionality
+document.addEventListener('DOMContentLoaded', () => {
+    initializeUpdateProduct();
+});
+
+async function handleCollectionChange(productId, oldCollection, newCollection, updateData, errorContainer) {
+    try {
+        // Add to new collection
+        const newColRef = collection(db, newCollection);
+        const newDocRef = await addDoc(newColRef, updateData);
         
-//         if (productIndex !== -1) {
-//             products[productIndex] = {
-//                 ...products[productIndex],
-//                 name: name,
-//                 category: category,
-//                 price: price,
-//                 description: description
-//             };
-            
-//             filterAndSortProducts();
-           
-//             const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
-//             modal.hide();
-          
-//             showAlert('Product updated successfully!', 'success');
-//         }
-//     } else {
-//         showAlert('Please fill all required fields!', 'danger');
-//     }
-// });
+        // Delete from old collection
+        const oldDocRef = doc(db, oldCollection, productId);
+        await deleteDoc(oldDocRef);
+        
+        // Update local data with new ID and collection
+        const productIndex = loadProducts.findIndex(p => p.id === productId);
+        if (productIndex !== -1) {
+            loadProducts[productIndex] = {
+                ...updateData,
+                id: newDocRef.id,
+                collectionName: newCollection
+            };
+        }
+        
+        showUpdateSuccess();
+    } catch (error) {
+        showUpdateError(error, errorContainer);
+    }
+}
 
-
-// renderProducts();
-
-// applyFiltersBtn.addEventListener('click', filterAndSortProducts);
-
-//----------------------------------------------------------------------------
-
-//prevent to return back to genral page when refershing the page
-// function saveActiveSection(sectionId) {
-//     localStorage.setItem('activeSection', sectionId);
-// }
-
-// function loadActiveSection() {
-//     return localStorage.getItem('activeSection') || 'general'; // Default to general if not set
-// }
-
-// function activateSection(section, link) {
-//     document.querySelectorAll('.page-section').forEach(sec => {
-//         sec.classList.remove('active');
-//     });
+// Helper function to update local product data
+function updateLocalProductData(productId, updateData, collectionName) {
+    const productIndex = loadProducts.findIndex(p => p.id === productId);
+    if (productIndex !== -1) {
+        loadProducts[productIndex] = {
+            ...loadProducts[productIndex],
+            ...updateData,
+            collectionName: collectionName
+        };
+    }
     
-//     document.querySelectorAll('.nav-link').forEach(navLink => {
-//         navLink.classList.remove('active');
-//     });
-    
-//     section.classList.add('active');
-    
-//     link.classList.add('active');
-    
-//     if (section === generalSection) {
-//         saveActiveSection('general');
-//     } else if (section === productsSection) {
-//         saveActiveSection('products');
-//     }
-// }
+    refreshProducts();
+    renderProducts(loadProducts);
+}
 
-// document.addEventListener('DOMContentLoaded', function() {
-//     const activeSection = loadActiveSection();
-//     if (activeSection === 'products') {
-//         activateSection(productsSection, productsLink);
-//         renderProducts();
-//     } else {
-//         activateSection(generalSection, generalLink);
-//     }
-// });
+// Helper function to show update success
+function showUpdateSuccess() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
+    modal.hide();
+    showAlert('Product updated successfully!', 'success');
+}
+
+// Helper function to show update error
+function showUpdateError(error, errorContainer) {
+    console.error('Update error:', error);
+    errorContainer.innerHTML = `
+        <strong>Server Error:</strong>
+        <div class="mb-0">${error.message}</div>
+    `;
+    errorContainer.classList.remove('d-none');
+    errorContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Enhanced remove image functionality for edit modal
+document.addEventListener("click", function (e) {
+    // Handle remove buttons for new images in edit modal
+    if (e.target && e.target.classList.contains("remove-btn-m-img") && e.target.id.includes('edit-remove')) {
+        const parentDiv = e.target.parentElement;
+        const input = parentDiv.querySelector("input[type='file']");
+        const inputId = input ? input.id : undefined;
+
+        if (inputId && editUrlMap.has(inputId)) {
+            const urlToRemove = editUrlMap.get(inputId);
+            editUrlsUploaded = editUrlsUploaded.filter(url => url !== urlToRemove);
+            editUrlMap.delete(inputId);
+        }
+        
+        // Also remove any upload status indicators
+        const statusSpan = parentDiv.querySelector('span[id^="deliveredOrNot-"]');
+        if (statusSpan) {
+            statusSpan.remove();
+        }
+        
+        parentDiv.remove(); 
+    }
+    
+    // Handle remove buttons for sizes in edit modal
+    if (e.target && e.target.classList.contains("remove-btn-m")) {
+        const parentDiv = e.target.parentElement;
+        // Only remove if it's not the last size item
+        const sizeContainer = parentDiv.parentElement;
+        const sizeItems = sizeContainer.querySelectorAll('.size-item-m');
+        
+        if (sizeItems.length > 1) {
+            parentDiv.remove();
+        } else {
+            showAlert('At least one size is required.', 'warning');
+        }
+    }
+});
+
+// Clear edit modal data when closed
+document.getElementById('editProductModal').addEventListener('hidden.bs.modal', function () {
+    // Clear upload arrays
+    editUrlsUploaded = [];
+    editUrlMap.clear();
+    imagesToDelete = [];
+    editImageId = 0;
+    
+    // Clear error messages
+    document.getElementById('edit-product-errors').classList.add('d-none');
+    
+    // Reset form
+    document.getElementById('edit-product-form').reset();
+});
 
