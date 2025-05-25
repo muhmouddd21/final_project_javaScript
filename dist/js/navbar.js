@@ -9,6 +9,11 @@ const closeCart = document.querySelector(".cart-panel .close-cart");
 const closeSearch = document.querySelector(".search-panel .close-cart");
 const emptyCart = document.querySelector(".empty-cart");
 const cartItems = document.querySelector(".cart-items");
+const proceedPurchase = document.querySelector(".proceed-purchase");
+
+proceedPurchase.addEventListener("click", () => {
+  window.location.href = "payment.html";
+});
 
 let arrCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
 
