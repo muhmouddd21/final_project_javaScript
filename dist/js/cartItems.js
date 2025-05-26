@@ -1,29 +1,14 @@
 import { db, collection, getDocs } from "./config.js";
+import { renderWishlist } from "./wishlist.js";
+let itemChosen = {};
 
-function transformImageUrl(url, width, height) {
-  return `${url}?width=${width}&height=${height}`;
-}
-
-function calculateDiscount(price, discount) {
-  return Math.round(price * (1 - discount / 100));
-}
-
-function handlePopupClose(productId) {
-  document
-    .getElementById(`pop-up-shopping-${productId}`)
-    ?.classList.remove("open");
-  document
-    .getElementById(`pop-up-shopping-${productId}`)
-    ?.previousElementSibling?.classList.remove("open");
-}
-
-function handleFavouriteToggle(productId, e, fav) {
+function handleFavouriteToggle(product, e, fav) {
   const iconDiv = e.currentTarget;
   const icon = iconDiv.querySelector("i");
-  const index = fav.indexOf(productId);
+  const index = fav.findIndex((item) => item.id === product.id);
 
   if (index === -1) {
-    fav.push(productId);
+    fav.push(product);
     iconDiv.classList.add("pressed");
     icon.classList.add("pressed-icon");
   } else {
@@ -33,7 +18,12 @@ function handleFavouriteToggle(productId, e, fav) {
   }
 
   localStorage.setItem("myFavs", JSON.stringify(fav));
+  if (window.location.pathname.endsWith("wishlist.html")) {
+    renderWishlist(fav);
+  }
 }
+
+/*above this line to be rev*/
 
 function handleAddToCart(productId, products) {
   const selectedSize = document.querySelector(
@@ -43,16 +33,9 @@ function handleAddToCart(productId, products) {
     `#colors-product-pop-${productId} .thumbnail-pop-image.active`
   )?.src;
 
-  if (!selectedSize || !selectedImage) {
-    alert("Please select both a size and a color.");
-    return;
-  }
-
   const product = products.find((p) => p.id === productId);
-  if (!product) return;
-
   const salePrice = calculateDiscount(product.price, product.discount);
-  const itemChosen = {
+  itemChosen = {
     id: product.id,
     title: product.title,
     price: product.price,
@@ -61,21 +44,27 @@ function handleAddToCart(productId, products) {
     selectedSize,
     selectedImageUrl: selectedImage,
   };
-
   localStorage.setItem("itemChosen", JSON.stringify(itemChosen));
-  handlePopupClose(productId);
+  closePopup(productId);
+}
+
+/*==============================================*/
+
+/*============================================*/
+function popUpMenuForShopping(productId, products) {
+  const popup = document.getElementById(`pop-up-shopping-${productId}`);
+  const overlay = document.getElementById("pop-up-overlay");
+  popup.classList.add("open");
+  overlay.classList.add("open");
+  renderPopupContent(productId, products);
 }
 
 function renderPopupContent(productId, products) {
   const product = products.find((p) => p.id === productId);
-  if (!product) return;
-
   const { title, price, discount, sizes, url } = product;
   const salePrice = calculateDiscount(price, discount);
   const saving = price - salePrice;
-
   const popup = document.getElementById(`pop-up-shopping-${productId}`);
-  if (!popup) return;
 
   popup.innerHTML = `
     <button class="close-btn" id="close-btn-popUp-${productId}">×</button>
@@ -99,7 +88,7 @@ function renderPopupContent(productId, products) {
     const sizeDiv = document.createElement("div");
     sizeDiv.classList.add("size-option");
     sizeDiv.textContent = size;
-    if (i === 0) sizeDiv.classList.add("selected");
+    if (i == 0) sizeDiv.classList.add("selected");
     sizeDiv.addEventListener("click", () => {
       sizesContainer
         .querySelectorAll(".size-option")
@@ -112,11 +101,13 @@ function renderPopupContent(productId, products) {
   const colorsContainer = document.getElementById(
     `colors-product-pop-${productId}`
   );
+
   url.forEach((imgUrl, i) => {
     const img = document.createElement("img");
     img.src = transformImageUrl(imgUrl, 2400, 2400);
     img.classList.add("thumbnail-pop-image");
-    if (i === 0) img.classList.add("active");
+    if (i == 0) img.classList.add("active");
+
     img.addEventListener("click", () => {
       colorsContainer
         .querySelectorAll(".thumbnail-pop-image")
@@ -132,117 +123,107 @@ function renderPopupContent(productId, products) {
 
   document
     .getElementById(`close-btn-popUp-${productId}`)
-    .addEventListener("click", () => handlePopupClose(productId));
-}
-
-function popUpMenuForShopping(productId, products) {
-  const popup = document.getElementById(`pop-up-shopping-${productId}`);
-  const overlay = popup?.previousElementSibling;
-
-  if (popup && overlay) {
-    popup.classList.add("open");
-    overlay.classList.add("open");
-    renderPopupContent(productId, products);
-  } else {
-    console.error("Popup or overlay not found for product:", productId);
-  }
+    .addEventListener("click", () => closePopup(productId));
 }
 
 export function setupEventListeners(products, fav) {
-  products.forEach(({ id: productId }) => {
-    const shoppingBtn = document.getElementById(`shop-${productId}`);
-    const favBtn = document.getElementById(`love-${productId}`);
+  products.forEach((product) => {
+    const shoppingBtn = document.getElementById(`shop-${product.id}`);
+    const favBtn = document.getElementById(`love-${product.id}`);
 
     shoppingBtn.addEventListener("click", () =>
-      popUpMenuForShopping(productId, products)
+      popUpMenuForShopping(product.id, products)
     );
     favBtn.addEventListener("click", (e) =>
-      handleFavouriteToggle(productId, e, fav)
+      handleFavouriteToggle(product, e, fav)
     );
   });
 }
 
-function buildProductCards(products, fav) {
+/*----------------------------------------------------------------------*/
+export function buildProductCards(products, fav) {
   const container = document.getElementById("containerOfCards");
   container.innerHTML = "";
 
   products.forEach((product) => {
-    const { id: productId, url, sizes, discount, title, price } = product;
-    const croppedUrl = transformImageUrl(url[0], 2400, 2400);
+    const { id, url, sizes, discount, title, price } = product;
+    const cropImgURL = transformImageUrl(url[0], 2400, 2400);
 
-    const sizeSpans = sizes
-      .map(
-        (size, i) =>
-          `<span class="size-elem" id="size-${productId}-${i}">${size}</span>`
-      )
-      .join("");
-
-    const thumbnails = url
-      .slice(1)
-      .map(
-        (thumbUrl, j) =>
-          `<img class="thumbnail" id="previewImage-${productId}-${
-            j + 1
-          }" src="${transformImageUrl(thumbUrl, 2400, 2400)}" />`
-      )
-      .join("");
+    const thumbnails = url.map(
+      (thumbUrl, i) =>
+        `<img
+            class="thumbnail img-${i}"
+            id="${id}"
+            src="${transformImageUrl(thumbUrl, 2400, 2400)}"
+          />`
+    );
 
     container.innerHTML += `
-      <div class="card-m" data-product-id="${productId}">
+      <div class="card-m" data-product-id="${id}">
         <div class="image">
-          <img id="previewImage-${productId}" src="${croppedUrl}" />
+          <img id="previewImage-${id}" src="${cropImgURL}" />
           <div class="action-icons">
-            <div class="icon shop-icon" id="shop-${productId}">
+            <div class="icon shop-icon" id="shop-${id}">
               <i class="fa-solid fa-cart-shopping"></i>
             </div>
             <div class="icon love-icon ${
-              fav.includes(productId) ? "pressed" : ""
-            }" id="love-${productId}">
+              fav.some((favItem) => favItem.id === id) ? "pressed" : ""
+            }" id="love-${id}">
               <i class="fa-solid fa-heart ${
-                fav.includes(productId) ? "pressed-icon" : ""
+                fav.some((favItem) => favItem.id === id) ? "pressed-icon" : ""
               }"></i>
             </div>
           </div>
-          <div class="sizes" id="sizes-${productId}">
-            ${sizeSpans}
-          </div>
         </div>
 
-        <div class="discount-badge" id="discount-badge-${productId}">
+        <div class="discount-badge" id="discount-badge-${id}">
           -${discount}%
         </div>
 
         <div class="info">
-          <h3 class="product-title" id="product-title-${productId}">${title}</h3>
+          <h3 class="product-title" id="product-title-${id}">${title}</h3>
           <div class="product-price">
-            <span class="original-price" id="original-price-${productId}">LE ${price}.00</span>
-            <span class="sale-price" id="sale-price-${productId}">LE ${calculateDiscount(
-      price,
-      discount
-    )}.00</span>
+            <span class="original-price" id="original-price-${id}">LE ${price}.00</span>
+            <span class="sale-price" id="sale-price-${id}">
+              LE ${calculateDiscount(price, discount)}.00
+            </span>
           </div>
         </div>
 
-        <div class="thumbnail-container" id="thumbnail-container-${productId}">
-          <div class="pop-up-overlay"></div>
-          <div class="pop-up" id="pop-up-shopping-${productId}"></div>
+        <div class="thumbnail-container" id="thumbnail-container-${id}">
+          <div class="pop-up-overlay" id="pop-up-overlay"></div>
+          <div class="pop-up" id="pop-up-shopping-${id}"></div>
           ${thumbnails}
         </div>
       </div>
     `;
   });
+
+  const allThumbnails = document.querySelectorAll(".thumbnail");
+
+  allThumbnails.forEach((thumb) => {
+    thumb.addEventListener("click", () => {
+      const card = thumb.closest(".card-m");
+      const previewImage = card.querySelector(".image > img");
+      previewImage.src = thumb.src;
+    });
+  });
 }
 
+/*----------------------------------------------------------------------*/
+function closePopup(productId) {
+  document
+    .getElementById(`pop-up-shopping-${productId}`)
+    .classList.remove("open");
+  document.getElementById("pop-up-overlay").classList.remove("open");
+}
+/*----------------------------------------------------------------------*/
 export function renderProductPage(collectionNames) {
   const products = [];
   const fav = JSON.parse(localStorage.getItem("myFavs")) || [];
 
   document.addEventListener("DOMContentLoaded", () => {
-    const collectionsToLoad = Array.isArray(collectionNames)
-      ? collectionNames
-      : [collectionNames];
-
-    Promise.all(collectionsToLoad.map((name) => getDocs(collection(db, name))))
+    Promise.all(collectionNames.map((name) => getDocs(collection(db, name))))
       .then((snapshots) => {
         snapshots.forEach((snapshot) => {
           const docs = snapshot.docs.map((doc) => ({
@@ -258,3 +239,12 @@ export function renderProductPage(collectionNames) {
       .catch((error) => console.error("Error loading products:", error));
   });
 }
+
+function transformImageUrl(url, width, height) {
+  return `${url}?width=${width}&height=${height}`;
+}
+
+function calculateDiscount(price, discount) {
+  return Math.round(price * (1 - discount / 100));
+}
+/*----------------------------------------------------------------------*/

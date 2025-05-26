@@ -1,37 +1,23 @@
-
-.empty-wish-list {
-    line-height: 2rem;
-    letter-spacing: 0.05rem;
-    font-size: 1.15rem;
-    margin: 2rem;
+.btn-continue-shopping:hover {
+  background-color: rgb(50, 49, 49);
 }
 
-.empty-wish-list strong {
-    text-transform: uppercase;
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-.empty-wish-list button {
-    display: block;
-    padding: 0.7rem;
-    width: 18rem;
-    font-size: 1.2rem;
-    margin: 3rem auto 2rem;
-    background-color: var(--button-background);
-    color: var(--button-color);
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: background-color 0.3s ease;
+.btn-continue-shopping {
+  background-color: black;
+  color: white;
+  padding: 1rem;
+  text-transform: uppercase;
 }
-
-
-.btn-continue-shopping:hover{
-    background-color: rgb(50, 49, 49);
-}
-.wishlist-items{
-    display: grid;  
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    padding: 2rem;
+.wishlist-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
 }
 .image-m {
   min-height: 300px;
@@ -44,7 +30,6 @@
   pointer-events: none;
 }
 .image-m img {
-
   width: 100%;
   height: auto;
   aspect-ratio: 3/4;
@@ -139,7 +124,6 @@
   font-size: 10px;
 }
 
-
 .action-icons .icon:hover,
 .sizes .size-elem:hover {
   transform: scale(1.1);
@@ -206,5 +190,3 @@
 .action-icons * {
   pointer-events: auto;
 }
-
-
