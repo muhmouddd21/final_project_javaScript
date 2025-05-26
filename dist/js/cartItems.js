@@ -193,7 +193,7 @@ export function buildProductCards(products, fav) {
         <div class="thumbnail-container" id="thumbnail-container-${id}">
           <div class="pop-up-overlay" id="pop-up-overlay"></div>
           <div class="pop-up" id="pop-up-shopping-${id}"></div>
-          ${thumbnails}
+          ${thumbnails.join("")}
         </div>
       </div>
     `;
