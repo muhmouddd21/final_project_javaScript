@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="../style/footer.css" />
     <link rel="stylesheet" href="../style/product-pages.css" />
     <link rel="stylesheet" href="../style/wishlist.css" />
+    <link rel="stylesheet" href="../style/master.css" />
   </head>
 
   <body>
@@ -37,26 +38,20 @@
     <div class="container">
       <div class="my-favourites">
         <h2 class="section-title">My Wishlist</h2>
-        <div id="emptyWishList" class="empty-wish-list">
-          <strong>Oh! Your wishlist is empty.</strong>
-          <p>
-            Sign in to save or access items you’ve already added to your
-            shopping bag.
-          </p>
-          <button class="btn-continue-shopping" onclick="continueShopping()">
-            Continue Shopping &#10132;
-          </button>
-        </div>
-
         <div class="products">
-          <div id="wishlist-items" class="wishlist-items"></div>
+          <div class="container" id="containerOfCards"></div>
+          <div class="btn">
+            <button class="btn-continue-shopping"">
+            Continue Shopping &#10132;
+            </button></div>
+     
         </div>
       </div>
     </div>
     <div id="footer-container"></div>
 
     <script src="../js/loadHeaderFooter.js"></script>
-    <script src="../js/wishlist.js"></script>
+    <script type="module" src="../js/wishlist.js"></script>
     <script type="module" src="../js/cartItems.js"></script>
   </body>
 </html>
