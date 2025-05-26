@@ -1,8 +1,8 @@
 
-import { auth } from "./firebase.js";
+import { auth  } from "./firebase.js";
 import { db, collection,addDoc,Timestamp } from "./config.js";
 
-async function saveOrderToFirestore(cartItems, totalAmount) {
+async function saveOrderToFirestore(cartItems, totalAmount,orderId) {
   const user = auth.currentUser;
 
   if (!user) {
@@ -17,7 +17,8 @@ async function saveOrderToFirestore(cartItems, totalAmount) {
       createdAt: Timestamp.now(),
       totalAmount: totalAmount,
       items: cartItems,
-      status: "pending"
+      status: "pending",
+      orderId:orderId
     });
     console.log("Order saved with ID:", orderDoc.id);
     localStorage.removeItem("cartItems"); // Clear cart
@@ -146,12 +147,14 @@ placeOrderBtn.addEventListener("click", function () {
 });
 
 // Simulate order completion
-function simulateOrderCompletion() {
+async function simulateOrderCompletion() {
   // Hide payment form and show success message
   paymentForm.style.display = "none";
   orderSuccess.style.display = "block";
   // Generate random order number
   const orderNumber = "FAS-" + Math.floor(10000 + Math.random() * 90000);
+
+
   document.getElementById("order-number").textContent = orderNumber;
 
   // Calculate delivery date (7-10 days from today)
@@ -168,7 +171,7 @@ function simulateOrderCompletion() {
   const shipping = 50;
   const tax = Math.round(SummaryTotal * 0.14);
   const totalAmount = SummaryTotal + shipping + tax;
-  saveOrderToFirestore(cartItems, totalAmount);
+  saveOrderToFirestore(cartItems, totalAmount,orderNumber);
 }
 /*https://adel.dev/scripts/stripe.php*/
 async function stripeBackend(price) {
@@ -270,3 +273,4 @@ orderTotals();
 /*
 
 */
+

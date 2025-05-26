@@ -106,6 +106,7 @@ if (loginForm) {
 
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
+      localStorage.setItem("userId", cred.user.uid); 
       window.location.href = "index.html";
     } catch (error) {
       console.error("Login error:", error);
@@ -175,6 +176,7 @@ onAuthStateChanged(auth, (user) => {
     wrapper.classList.add("logged-in");
     userIcon.href = "#";
     createUserCollectionIfNotExists(user.uid);
+
   } else {
     wrapper.classList.remove("logged-in");
     userIcon.href = "loginForm.html";
