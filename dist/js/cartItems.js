@@ -1,4 +1,4 @@
-import { db, collection, getDocs } from "../../src/config.js";
+import { db, collection, getDocs } from "./config.js";
 
 function transformImageUrl(url, width, height) {
   return `${url}?width=${width}&height=${height}`;

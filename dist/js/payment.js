@@ -87,9 +87,8 @@ placeOrderBtn.addEventListener("click", function () {
   if (validateForm()) {
     // Show loading state
     this.innerHTML =
-      '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+      '<span class="spinner-border spinner-border-sm me-2" role="status" "></span> Processing...';
     this.disabled = true;
-
     const selectedPayment = document.querySelector(
       'input[name="payment"]:checked'
     ).value;
@@ -110,7 +109,6 @@ function simulateOrderCompletion() {
   // Hide payment form and show success message
   paymentForm.style.display = "none";
   orderSuccess.style.display = "block";
-
   // Generate random order number
   const orderNumber = "FAS-" + Math.floor(10000 + Math.random() * 90000);
   document.getElementById("order-number").textContent = orderNumber;
@@ -124,10 +122,10 @@ function simulateOrderCompletion() {
   document.getElementById("delivery-date").textContent =
     deliveryDate.toLocaleDateString("en-US", options);
 }
-
+/*https://adel.dev/scripts/stripe.php*/
 async function stripeBackend(price) {
   const baseUrl = `${window.location.protocol}//${window.location.host}`;
-  const response = await fetch("https://adel.dev/scripts/stripe.php", {
+  const response = await fetch("link", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -157,6 +155,11 @@ if (location.search.includes("status=success")) {
     window.location.pathname;
   window.history.replaceState({}, document.title, newUrl);
   simulateOrderCompletion();
+  const contShopping = document.getElementById("continue-shopping");
+  console.log(contShopping);
+  contShopping.addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
 }
 
 /*====================================================================================*/
@@ -167,8 +170,6 @@ function orderSummary() {
   const summaryContainer = document.querySelector(".cart-items");
   summaryContainer.innerHTML = "";
   arrCartItems.forEach((item) => {
-    console.log(item);
-
     const itemHTML = `<div
                   class="cart-item d-flex align-items-center mb-3 pb-3 border-bottom">
                   <img
@@ -217,3 +218,7 @@ function orderTotals() {
 orderSummary();
 orderTotals();
 /*====================================================================================*/
+
+/*
+
+*/

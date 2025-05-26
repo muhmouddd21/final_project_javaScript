@@ -1,3 +1,5 @@
+import { db, collection, getDocs, doc } from "./config.js";
+import { setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { auth } from "./firebase.js";
 import {
   createUserWithEmailAndPassword,
@@ -161,10 +163,12 @@ userIcon.addEventListener("click", () => {
     : (window.location.href = "loginForm.html");
 });
 
+/*======================================================*/
 onAuthStateChanged(auth, (user) => {
   if (user) {
     wrapper.classList.add("logged-in");
     userIcon.href = "#";
+    createUserCollectionIfNotExists(user.uid);
   } else {
     wrapper.classList.remove("logged-in");
     userIcon.href = "loginForm.html";
@@ -175,3 +179,14 @@ onAuthStateChanged(auth, (user) => {
 logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => (window.location.href = "index.html"));
 });
+
+async function createUserCollectionIfNotExists(userId) {
+  const userCollectionRef = collection(db, userId);
+  const snapshot = await getDocs(userCollectionRef);
+  if (snapshot.empty) {
+    await setDoc(doc(db, "users", userId), {
+      createdAt: new Date().toISOString(),
+    });
+    console.log(`Collection for user ${userId} created with placeholder.`);
+  }
+}
