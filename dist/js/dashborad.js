@@ -1,15 +1,30 @@
-import { auth } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
-import {
-  db,
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
-  addDoc,
-  updateDoc,
-} from "./config.js";
+
+import { db, collection, getDocs,deleteDoc,doc,addDoc,updateDoc } from "./config.js";
+import {auth} from './firebase.js'
+
+import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// Check authentication state
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = "loginForm.html";
+    return;
+  }
+
+  // Check user role
+  const userDoc = await getDoc(doc(db, "users", user.uid));
+  const userData = userDoc.data();
+
+  if (userData?.role !== "admin\n") {
+    alert("Access denied!");
+    window.location.href = "index.html";
+  }
+});
+
+
+
+
 
 const loadProducts = [];
 let originalProducts = [];
