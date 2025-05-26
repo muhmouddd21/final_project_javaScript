@@ -205,6 +205,8 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     wrapper.classList.add("logged-in");
     userIcon.href = "#";
+
+
   } else {
     wrapper.classList.remove("logged-in");
     userIcon.href = "loginForm.html";
@@ -215,6 +217,7 @@ onAuthStateChanged(auth, (user) => {
 logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => (window.location.href = "index.html"));
 });
+
 
 
 // async function createUserCollectionIfNotExists(userId) {
@@ -233,3 +236,4 @@ logoutBtn.addEventListener("click", () => {
 //     console.log(`Collection for user ${userId} created with placeholder.`);
 //   }
 // }
+
