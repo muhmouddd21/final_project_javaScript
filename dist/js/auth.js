@@ -12,9 +12,7 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
-
-
-let userData=[];
+let userData = [];
 // Utils
 function showMessage(message, isError = true) {
   const messageBox = document.getElementById("auth-message");
@@ -106,7 +104,7 @@ if (loginForm) {
 
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
-      localStorage.setItem("userId", cred.user.uid); 
+      localStorage.setItem("userId", cred.user.uid);
       window.location.href = "index.html";
     } catch (error) {
       console.error("Login error:", error);
@@ -175,8 +173,8 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     wrapper.classList.add("logged-in");
     userIcon.href = "#";
-    createUserCollectionIfNotExists(user.uid);
 
+    /* createUserCollectionIfNotExists(user.uid);*/
   } else {
     wrapper.classList.remove("logged-in");
     userIcon.href = "loginForm.html";
@@ -188,7 +186,7 @@ logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => (window.location.href = "index.html"));
 });
 
-async function createUserCollectionIfNotExists(userId) {
+/*async function createUserCollectionIfNotExists(userId) {
   const userCollectionRef = collection(db, userId);
   const snapshot = await getDocs(userCollectionRef);
   if (snapshot.empty) {
@@ -196,8 +194,8 @@ async function createUserCollectionIfNotExists(userId) {
       createdAt: new Date().toISOString(),
       firstName: userData[0],
       lastName: userData[1],
-      email : userData[2]
+      email: userData[2],
     });
     console.log(`Collection for user ${userId} created with placeholder.`);
   }
-}
+}*/

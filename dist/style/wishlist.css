@@ -1,12 +1,12 @@
 .btn-continue-shopping:hover {
   background-color: rgb(50, 49, 49);
 }
-
-.btn {
+.products {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
+
 .btn-continue-shopping {
   background-color: black;
   color: white;

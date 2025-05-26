@@ -9,12 +9,21 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "webpack": "^5.99.8",
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "firebase": "^11.7.3"
-  }
+    "firebase": "^11.7.3",
+    "firebase-admin": "^13.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muhmouddd21/final_project_javaScript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/muhmouddd21/final_project_javaScript/issues"
+  },
+  "homepage": "https://github.com/muhmouddd21/final_project_javaScript#readme",
+  "description": ""
 }
