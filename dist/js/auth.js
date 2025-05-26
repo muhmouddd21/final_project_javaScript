@@ -14,6 +14,8 @@ import {
 
 
 
+
+
 // Utils
 function showMessage(message, isError = true) {
   const messageBox = document.getElementById("auth-message");
@@ -112,6 +114,7 @@ if (loginForm) {
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
 
+
       // Get user role from Firestore
       const userDoc = await getDoc(doc(db, "users", cred.user.uid));
 
@@ -124,6 +127,7 @@ if (loginForm) {
       } else {
         window.location.href = "index.html";
       }
+
 
 
 
@@ -211,6 +215,7 @@ onAuthStateChanged(auth, (user) => {
 logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => (window.location.href = "index.html"));
 });
+
 
 // async function createUserCollectionIfNotExists(userId) {
 //   const userCollectionRef = collection(db, userId);
