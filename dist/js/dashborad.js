@@ -1,5 +1,5 @@
 
-import { db, collection, getDocs,deleteDoc,doc,addDoc,updateDoc } from "../../src/config.js";
+import { db, collection, getDocs,deleteDoc,doc,addDoc,updateDoc } from "./config.js";
 
 
 const loadProducts = [];

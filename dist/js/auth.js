@@ -100,6 +100,7 @@ if (loginForm) {
 
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
+      localStorage.clear();
       window.location.href = "index.html";
     } catch (error) {
       console.error("Login error:", error);
@@ -121,6 +122,7 @@ if (loginForm) {
     .addEventListener("click", async () => {
       try {
         const result = await signInWithPopup(auth, provider);
+        localStorage.clear();
         window.location.href = "index.html";
       } catch (error) {
         console.error("Google Login Error:", error);
