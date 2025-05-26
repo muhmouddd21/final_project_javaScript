@@ -234,3 +234,10 @@ function initializeCart() {
 }
 
 initializeCart();
+
+/*=======================================================*/
+
+const viewProfile = document.getElementById("profile-btn");
+viewProfile.addEventListener("click", () => {
+  window.location.href = "admin-dashboard.html";
+});
