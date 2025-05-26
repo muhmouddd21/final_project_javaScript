@@ -174,7 +174,7 @@ onAuthStateChanged(auth, (user) => {
     wrapper.classList.add("logged-in");
     userIcon.href = "#";
 
-    /* createUserCollectionIfNotExists(user.uid);*/
+    createUserCollectionIfNotExists(user.uid);
   } else {
     wrapper.classList.remove("logged-in");
     userIcon.href = "loginForm.html";
@@ -186,7 +186,7 @@ logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => (window.location.href = "index.html"));
 });
 
-/*async function createUserCollectionIfNotExists(userId) {
+async function createUserCollectionIfNotExists(userId) {
   const userCollectionRef = collection(db, userId);
   const snapshot = await getDocs(userCollectionRef);
   if (snapshot.empty) {
@@ -198,4 +198,4 @@ logoutBtn.addEventListener("click", () => {
     });
     console.log(`Collection for user ${userId} created with placeholder.`);
   }
-}*/
+}
