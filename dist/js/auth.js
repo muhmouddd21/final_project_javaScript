@@ -1,5 +1,5 @@
 import { db, collection, getDocs, doc } from "./config.js";
-import { setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { setDoc,getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { auth } from "./firebase.js";
 import {
   createUserWithEmailAndPassword,
@@ -12,7 +12,10 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
-let userData = [];
+
+
+
+
 // Utils
 function showMessage(message, isError = true) {
   const messageBox = document.getElementById("auth-message");
@@ -53,16 +56,22 @@ if (registerForm) {
     }
 
     try {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      userData.push(firstName);
-      userData.push(lastName);
-      userData.push(email);
-      await updateProfile(cred.user, {
-        displayName: `${firstName} ${lastName}`,
-      });
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-      window.location.href = "loginForm.html";
-      /*showMessage("Registration successful! Please log in.", false);*/
+        // Create user document IMMEDIATELY after registration
+        await setDoc(doc(db, "users", cred.user.uid), {
+          createdAt: new Date().toISOString(),
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          role: "user" // Add default role
+        });
+
+        await updateProfile(cred.user, {
+          displayName: `${firstName} ${lastName}`,
+        });
+
+        window.location.href = "loginForm.html";
     } catch (error) {
       console.error("Registration error:", error);
       if (error.code === "auth/email-already-in-use") {
@@ -104,8 +113,24 @@ if (loginForm) {
 
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
-      localStorage.setItem("userId", cred.user.uid);
-      window.location.href = "index.html";
+
+
+      // Get user role from Firestore
+      const userDoc = await getDoc(doc(db, "users", cred.user.uid));
+
+      const  userData= userDoc.data();
+      // console.log(userData);
+      //     debugger;
+      // Redirect based on role
+      if (userData?.role === "admin\n") {
+        window.location.href = "admin-dashboard.html";
+      } else {
+        window.location.href = "index.html";
+      }
+
+
+
+
     } catch (error) {
       console.error("Login error:", error);
       if (
@@ -126,7 +151,14 @@ if (loginForm) {
     .addEventListener("click", async () => {
       try {
         const result = await signInWithPopup(auth, provider);
-        window.location.href = "index.html";
+        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+        const userData = userDoc.data();
+
+        if (userData?.role === "admin") {
+          window.location.href = "admin-dashboard.html";
+        } else {
+          window.location.href = "index.html";
+        }
       } catch (error) {
         console.error("Google Login Error:", error);
         showMessage("Google login failed. Try again.");
@@ -173,8 +205,6 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     wrapper.classList.add("logged-in");
     userIcon.href = "#";
-
-    /* createUserCollectionIfNotExists(user.uid);*/
   } else {
     wrapper.classList.remove("logged-in");
     userIcon.href = "loginForm.html";
@@ -186,16 +216,20 @@ logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => (window.location.href = "index.html"));
 });
 
-/*async function createUserCollectionIfNotExists(userId) {
-  const userCollectionRef = collection(db, userId);
-  const snapshot = await getDocs(userCollectionRef);
-  if (snapshot.empty) {
-    await setDoc(doc(db, "users", userId), {
-      createdAt: new Date().toISOString(),
-      firstName: userData[0],
-      lastName: userData[1],
-      email: userData[2],
-    });
-    console.log(`Collection for user ${userId} created with placeholder.`);
-  }
-}*/
+
+// async function createUserCollectionIfNotExists(userId) {
+//   const userCollectionRef = collection(db, userId);
+//   const snapshot = await getDocs(userCollectionRef);
+//   console.log(userData);
+  
+//   if (snapshot.empty) {
+//     await setDoc(doc(db, "users", userId), {
+//       createdAt: new Date().toISOString(),
+//       firstName: userData[0],
+//       lastName: userData[1],
+//       email: userData[2],
+//       role: "user" // Add this line to set default role
+//     });
+//     console.log(`Collection for user ${userId} created with placeholder.`);
+//   }
+// }
