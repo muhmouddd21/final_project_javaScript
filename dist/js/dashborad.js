@@ -1,6 +1,5 @@
 
-import { db, collection, getDocs,deleteDoc,doc,addDoc,updateDoc } from "../../src/config.js";
-
+import { db, collection, getDocs,deleteDoc,doc,addDoc,updateDoc } from "./config.js";
 
 const loadProducts = [];
 let  originalProducts =[];
@@ -8,7 +7,6 @@ let filterProducts = [];
 let urlsUploaded=[];
 let urlMap = new Map();
 let collectionsNames= ["men-bottoms","men-tops","women-bottoms","women-tops"];
-
 async function getProductsFromDB(collectionsNames) {
 
         for(let i=0; i <collectionsNames.length; i++){
@@ -34,6 +32,9 @@ async function getProductsFromDB(collectionsNames) {
   refreshProducts();
   addEventListenerforFiles();
   renderProducts(loadProducts); 
+
+
+  
 })();
 
 
@@ -49,45 +50,49 @@ const generalSection = document.getElementById('general-section');
 const productsSection = document.getElementById('products-section');
 const productTableBody = document.getElementById('product-table-body');
 const saveProductBtn = document.getElementById('save-product-btn');
+
 // const updateProductBtn = document.getElementById('update-product-btn');
+
 const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 const filterCategorySelect = document.getElementById('filter-category');
 // const sortBySelect = document.getElementById('sort-by');
 // const applyFiltersBtn = document.getElementById('apply-filters-btn');
 const noProductsMessage = document.getElementById('no-products-message');
 const  productCategoryInAddProduct =document.getElementById('product-category');
+const ordersLink = document.getElementById('orders-link');
+const ordersSection = document.getElementById('orders-section');
 
 
-// Navigate from general to product section
+
 generalLink.addEventListener('click', function(e) {
     e.preventDefault();
-  
-    
     activateSection(generalSection, generalLink);
 });
 
 productsLink.addEventListener('click', function(e) {
     e.preventDefault();
     activateSection(productsSection, productsLink);
-    renderProducts(loadProducts);
+    renderProducts(loadProducts); 
+});
+
+ordersLink.addEventListener('click', function(e) {
+    e.preventDefault();
+    activateSection(ordersSection, ordersLink);
+    loadOrdersSection();
 });
 
 function activateSection(section, link) {
-
-    document.querySelectorAll('.page-section').forEach(sec => {
-        sec.classList.remove('active');
+        document.querySelectorAll('.page-section').forEach(sec => {
+            sec.classList.remove('active');
     });
 
     document.querySelectorAll('.nav-link').forEach(navLink => {
         navLink.classList.remove('active');
     });
-    
+            
     section.classList.add('active');
-    
     link.classList.add('active');
 }
-
-
 
 
 
@@ -1157,3 +1162,230 @@ document.getElementById('editProductModal').addEventListener('hidden.bs.modal', 
     document.getElementById('edit-product-form').reset();
 });
 
+// -------------------- order history
+let isLoadingOrders = false;
+let currentLoadingOperation = null;
+
+
+  async function getUsersFromDB() {
+    let users =[];
+    const usersCollection = collection(db, "users");
+    const userSnapshots = await getDocs(usersCollection);
+
+    for (const userDoc of userSnapshots.docs) {
+        const userData = userDoc.data();
+        const userId = userDoc.id;
+
+        const ordersCollection = collection(db, `users/${userId}/orders`);
+        const ordersSnapshot = await getDocs(ordersCollection);
+
+        const orders = ordersSnapshot.docs.map(orderDoc => ({
+        id: orderDoc.id,
+        ...orderDoc.data(),
+        }));
+
+        users.push({
+        id: userId,
+        ...userData,
+        orders,  
+        });
+    }
+    return users;
+}
+
+     
+
+function getFilteredOrders(users) {
+    let filteredOrders =[];
+  users.forEach((user) => {
+    if (user.orders && user.orders.length > 0) {
+      user.orders.forEach((order) => {
+        filteredOrders.push({
+          id: order.orderId,
+          firstName:user.firstName,
+          lastName:user.lastName,
+          email:user.email,
+          createdAt: new Date(user.createdAt),
+          status: order.status,
+          totalAmount: order.totalAmount,
+          items: order.items || [],
+        });
+      });
+    } else {
+      filteredOrders.push({
+        id: "none",
+        firstName:user.firstName,
+        lastName:user.lastName,
+        email:user.email,
+        createdAt: new Date(user.createdAt),
+        status: "None",
+        totalAmount: 0,
+        items: [],
+      });
+    }
+  });
+  return filteredOrders; 
+}
+        
+
+const ordersTableBody = document.getElementById('orders-table-body');
+const noOrdersMessage = document.getElementById('no-orders-message');
+const ordersLoading = document.getElementById('orders-loading');
+const refreshOrdersBtn = document.getElementById('refresh-orders-btn');
+
+
+async function loadOrdersSection() {
+ 
+    if (isLoadingOrders) {
+        console.log('Already loading orders, skipping...');
+        return;
+    }
+    
+
+    isLoadingOrders = true;
+    
+
+    const operationId = Date.now();
+    currentLoadingOperation = operationId;
+    
+    try {
+        showOrdersLoading(true);
+        
+
+        if (currentLoadingOperation !== operationId) {
+            console.log('Load operation cancelled');
+            return;
+        }
+        
+        const users = await getUsersFromDB();
+        console.log('Users loaded:', users);
+        
+ 
+        if (currentLoadingOperation !== operationId) {
+            console.log('Load operation cancelled after getUsersFromDB');
+            return;
+        }
+        
+        const filteredOrders = getFilteredOrders(users);
+        console.log('Filtered orders:', filteredOrders);
+        
+
+        if (currentLoadingOperation !== operationId) {
+            console.log('Load operation cancelled before rendering');
+            return;
+        }
+        
+        renderOrders(filteredOrders);
+        showOrdersLoading(false);
+        
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        showOrdersLoading(false);
+  
+    } finally {
+
+        if (currentLoadingOperation === operationId) {
+            isLoadingOrders = false;
+            currentLoadingOperation = null;
+        }
+    }
+}
+
+ 
+function showOrdersLoading(show) {
+    if (show) {
+        ordersLoading.classList.remove('d-none');
+        ordersTableBody.innerHTML = '';
+        noOrdersMessage.classList.add('d-none');
+    } else {
+        ordersLoading.classList.add('d-none');
+    }
+}
+
+
+function renderOrders(orders) {
+    ordersTableBody.innerHTML = '';
+    
+    if (orders.length === 0) {
+        noOrdersMessage.classList.remove('d-none');
+        return;
+    }
+    
+    noOrdersMessage.classList.add('d-none');
+    
+    orders.forEach(order => {
+        const row = createOrderRow(order);
+        ordersTableBody.appendChild(row);
+    });
+}
+  function createOrderRow(order) {
+        const row = document.createElement('tr');
+        
+        const statusClass = getStatusClass(order.status);
+        const formattedDate = order.createdAt.toLocaleDateString() + ' ' + 
+                             order.createdAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        const itemsPreview = order.items.slice(0, 2).map(item => {
+        const title = item.title || 'Product';
+        const size = item.size ? `(${item.size})` : '';
+        const quantity = item.quantity || 1;
+        return `<div class="order-item">${title} ${size} x${quantity}</div>`;
+        }).join('');
+    
+        const moreItemsText = order.items.length > 2 ? 
+          `<div class="order-item">+${order.items.length - 2} more items</div>` : '';
+        
+        row.innerHTML = `
+          <td><code>${order.id}</code></td>
+          <td>${order.firstName}</td>
+          <td>${order.lastName}</td>
+          <td>${order.email}</td>
+          <td>${formattedDate}</td>
+          <td>
+            <div class="order-items">
+              ${itemsPreview}
+              ${moreItemsText}
+            </div>
+          </td>
+          <td><strong>${order.totalAmount.toFixed(2)}</strong></td>
+          <td><span class="order-status ${statusClass}">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span></td>
+        `;
+        
+        return row;
+}
+
+ 
+      function getStatusClass(status) {
+        switch(status) {
+          case 'pending': return 'status-pending';
+          case 'completed': return 'status-completed';
+          case 'cancelled': return 'status-cancelled';
+          default: return 'status-pending';
+        }
+    }   
+    
+document.addEventListener('DOMContentLoaded', function() {
+  
+    if (refreshOrdersBtn) {
+        refreshOrdersBtn.addEventListener('click', function() {
+            loadOrdersSection();
+        });
+    }
+  
+    loadOrdersSection();
+});
+
+
+window.addEventListener('beforeunload', function() {
+    currentLoadingOperation = null;
+    isLoadingOrders = false;
+});
+
+
+document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible' && isLoadingOrders) {
+  
+        console.log('Page became visible, checking loading state...');
+   
+    }
+});

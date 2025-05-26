@@ -12,6 +12,9 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
+
+
+let userData=[];
 // Utils
 function showMessage(message, isError = true) {
   const messageBox = document.getElementById("auth-message");
@@ -53,6 +56,9 @@ if (registerForm) {
 
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
+      userData.push(firstName);
+      userData.push(lastName);
+      userData.push(email);
       await updateProfile(cred.user, {
         displayName: `${firstName} ${lastName}`,
       });
@@ -100,6 +106,7 @@ if (loginForm) {
 
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
+      localStorage.setItem("userId", cred.user.uid); 
       window.location.href = "index.html";
     } catch (error) {
       console.error("Login error:", error);
@@ -169,6 +176,7 @@ onAuthStateChanged(auth, (user) => {
     wrapper.classList.add("logged-in");
     userIcon.href = "#";
     createUserCollectionIfNotExists(user.uid);
+
   } else {
     wrapper.classList.remove("logged-in");
     userIcon.href = "loginForm.html";
@@ -186,6 +194,9 @@ async function createUserCollectionIfNotExists(userId) {
   if (snapshot.empty) {
     await setDoc(doc(db, "users", userId), {
       createdAt: new Date().toISOString(),
+      firstName: userData[0],
+      lastName: userData[1],
+      email : userData[2]
     });
     console.log(`Collection for user ${userId} created with placeholder.`);
   }

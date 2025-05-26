@@ -1,3 +1,45 @@
+
+import { auth  } from "./firebase.js";
+import { db, collection,addDoc,Timestamp } from "./config.js";
+
+async function saveOrderToFirestore(cartItems, totalAmount,orderId) {
+  const user = auth.currentUser;
+
+  if (!user) {
+    console.error("User not authenticated.");
+    return;
+  }
+
+  const userOrdersRef = collection(db, "users", user.uid, "orders");
+
+  try {
+    const orderDoc = await addDoc(userOrdersRef, {
+      createdAt: Timestamp.now(),
+      totalAmount: totalAmount,
+      items: cartItems,
+      status: "pending",
+      orderId:orderId
+    });
+    console.log("Order saved with ID:", orderDoc.id);
+    localStorage.removeItem("cartItems"); // Clear cart
+  } catch (error) {
+    console.error("Error saving order:", error);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // DOM Elements
 const shippingForm = document.getElementById("shipping-form");
 const paymentOptions = document.querySelectorAll(".payment-option");
@@ -105,12 +147,14 @@ placeOrderBtn.addEventListener("click", function () {
 });
 
 // Simulate order completion
-function simulateOrderCompletion() {
+async function simulateOrderCompletion() {
   // Hide payment form and show success message
   paymentForm.style.display = "none";
   orderSuccess.style.display = "block";
   // Generate random order number
   const orderNumber = "FAS-" + Math.floor(10000 + Math.random() * 90000);
+
+
   document.getElementById("order-number").textContent = orderNumber;
 
   // Calculate delivery date (7-10 days from today)
@@ -121,6 +165,13 @@ function simulateOrderCompletion() {
   const options = { year: "numeric", month: "long", day: "numeric" };
   document.getElementById("delivery-date").textContent =
     deliveryDate.toLocaleDateString("en-US", options);
+
+
+  const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+  const shipping = 50;
+  const tax = Math.round(SummaryTotal * 0.14);
+  const totalAmount = SummaryTotal + shipping + tax;
+  saveOrderToFirestore(cartItems, totalAmount,orderNumber);
 }
 /*https://adel.dev/scripts/stripe.php*/
 async function stripeBackend(price) {
@@ -218,3 +269,4 @@ function orderTotals() {
 orderSummary();
 orderTotals();
 /*====================================================================================*/
+
