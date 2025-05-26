@@ -1,4 +1,3 @@
-//wishlist page
 let fav = JSON.parse(localStorage.getItem("myFavs"));
 let products = JSON.parse(localStorage.getItem("products"));
 

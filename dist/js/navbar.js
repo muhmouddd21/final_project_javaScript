@@ -1,4 +1,3 @@
-// DOM Elements
 const shoppingBag = document.querySelector(".shopping-bag");
 const cartPanel = document.querySelector(".cart-panel");
 const cartOverlay = document.querySelector(".cart-overlay");
@@ -158,7 +157,6 @@ function attachEventListeners() {
   });
 }
 
-// Panel Toggles
 shoppingBag.addEventListener("click", () => {
   const itemChosen = JSON.parse(localStorage.getItem("itemChosen"));
   if (itemChosen) {
@@ -166,7 +164,6 @@ shoppingBag.addEventListener("click", () => {
     localStorage.removeItem("itemChosen");
   }
 
-  // Always render items when opening the cart
   renderItems();
   cartPanel.classList.add("open");
   cartOverlay.classList.add("show");
@@ -202,8 +199,6 @@ window.addEventListener("click", function (e) {
   });
 });
 
-// Tab Switching
-
 document.getElementById("tab-men").addEventListener("click", () => {
   document.getElementById("tab-men").classList.add("active");
   document.getElementById("tab-women").classList.remove("active");
@@ -218,8 +213,6 @@ document.getElementById("tab-women").addEventListener("click", () => {
   document.querySelector(".category-list-men").style.display = "none";
 });
 
-// Mobile Menu
-
 document.getElementById("menu-toggle").addEventListener("click", () => {
   document.getElementById("menu").classList.add("open");
   cartOverlay.classList.add("show");
@@ -230,9 +223,7 @@ document.getElementById("menu-close").addEventListener("click", () => {
   cartOverlay.classList.remove("show");
 });
 
-// Initialize
 function initializeCart() {
-  // Check for items added from product page on initial load
   const itemChosen = JSON.parse(localStorage.getItem("itemChosen"));
   if (itemChosen) {
     addToCart(itemChosen);
