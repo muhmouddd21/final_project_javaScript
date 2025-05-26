@@ -1,7 +1,6 @@
 
 import { db, collection, getDocs,deleteDoc,doc,addDoc,updateDoc } from "./config.js";
 
-
 const loadProducts = [];
 let  originalProducts =[];
 let filterProducts = [];
@@ -1282,9 +1281,9 @@ async function loadOrdersSection() {
     } catch (error) {
         console.error('Error loading orders:', error);
         showOrdersLoading(false);
-        // Optionally show error message to user
+  
     } finally {
-        // Reset loading state only if this is still the current operation
+
         if (currentLoadingOperation === operationId) {
             isLoadingOrders = false;
             currentLoadingOperation = null;
