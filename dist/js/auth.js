@@ -125,6 +125,7 @@ if (loginForm) {
       if (userData?.role === "admin\n") {
         window.location.href = "admin-dashboard.html";
       } else {
+        localStorage.setItem("userId",cred.user.uid);
         window.location.href = "index.html";
       }
 
