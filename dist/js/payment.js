@@ -1,7 +1,7 @@
-import { auth  } from "./firebase.js";
-import { db, collection,addDoc,Timestamp } from "./config.js";
+import { auth } from "./firebase.js";
+import { db, collection, addDoc, Timestamp } from "./config.js";
 
-async function saveOrderToFirestore(cartItems, totalAmount,orderId) {
+async function saveOrderToFirestore(cartItems, totalAmount) {
   const user = auth.currentUser;
 
   if (!user) {
@@ -17,7 +17,6 @@ async function saveOrderToFirestore(cartItems, totalAmount,orderId) {
       totalAmount: totalAmount,
       items: cartItems,
       status: "pending",
-      orderId:orderId
     });
     console.log("Order saved with ID:", orderDoc.id);
     localStorage.removeItem("cartItems"); // Clear cart
@@ -26,18 +25,7 @@ async function saveOrderToFirestore(cartItems, totalAmount,orderId) {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+/*=========================Stripe===========================================================*/
 
 // DOM Elements
 const shippingForm = document.getElementById("shipping-form");
@@ -46,6 +34,15 @@ const stripeDetails = document.getElementById("stripe-details");
 const placeOrderBtn = document.getElementById("place-order-btn");
 const paymentForm = document.getElementById("payment-form");
 const orderSuccess = document.getElementById("order-success");
+
+// Initialize Stripe -  publishable key
+
+const stripe = Stripe(
+  "pk_test_51RQNgAFaoF7ngClnMh1jJ8UgKOZNpbLj5JkadZqPfM07ppkHxahzkhwXELdrpwQFvyO9Xue9cUrhj5AKas7NZDRC00dGNcQ8mr"
+);
+const elements = stripe.elements();
+// Create and mount the Stripe card Element
+const cardElement = elements.create("card");
 
 // Form Validation Function
 function validateForm() {
@@ -92,7 +89,31 @@ paymentOptions.forEach((option) => {
     // Check the radio button
     const radio = this.querySelector('input[type="radio"]');
     radio.checked = true;
+
+    // Show/hide Stripe details
+    if (radio.value === "stripe") {
+      stripeDetails.style.display = "block";
+      // Mount Stripe card element when selected
+      setTimeout(() => {
+        cardElement.mount("#card-element");
+      }, 100);
+    } else {
+      stripeDetails.style.display = "none";
+      cardElement.unmount();
+    }
   });
+});
+
+// Listen to card element changes
+cardElement.on("change", ({ error }) => {
+  const displayError = document.getElementById("card-errors");
+  if (error) {
+    displayError.textContent = error.message;
+    displayError.style.display = "block";
+  } else {
+    displayError.textContent = "";
+    displayError.style.display = "none";
+  }
 });
 
 // Input field validation on blur
@@ -128,32 +149,45 @@ placeOrderBtn.addEventListener("click", function () {
   if (validateForm()) {
     // Show loading state
     this.innerHTML =
-      '<span class="spinner-border spinner-border-sm me-2" role="status" "></span> Processing...';
+      '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
     this.disabled = true;
+
     const selectedPayment = document.querySelector(
       'input[name="payment"]:checked'
     ).value;
 
-    if (selectedPayment === "strip2") {
-      stripeBackend(5000);
-    } else if (selectedPayment === "cod") {
+    if (selectedPayment === "stripe") {
+      // Process Stripe payment
+      processStripePayment();
+    } else {
       // Simulate processing delay for non-Stripe payments
-      setTimeout(() => {
-        simulateOrderCompletion();
-      }, 2000);
+      simulateOrderCompletion();
     }
   }
 });
 
+// Process Stripe payment
+function processStripePayment() {
+  // Here we use just in stripe test mode
+  // But In a real implementation, we would:
+  // 1. Create a payment intent on our server
+  // 2. Confirm the payment with stripe.confirmCardPayment()
+
+  // Simulating a server request and payment processing
+  setTimeout(() => {
+    // Show success or handle errors
+    simulateOrderCompletion();
+  }, 2000);
+}
+
 // Simulate order completion
-async function simulateOrderCompletion() {
+function simulateOrderCompletion() {
   // Hide payment form and show success message
   paymentForm.style.display = "none";
   orderSuccess.style.display = "block";
+
   // Generate random order number
   const orderNumber = "FAS-" + Math.floor(10000 + Math.random() * 90000);
-
-
   document.getElementById("order-number").textContent = orderNumber;
 
   // Calculate delivery date (7-10 days from today)
@@ -164,53 +198,12 @@ async function simulateOrderCompletion() {
   const options = { year: "numeric", month: "long", day: "numeric" };
   document.getElementById("delivery-date").textContent =
     deliveryDate.toLocaleDateString("en-US", options);
-
-
-  const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-  const shipping = 50;
-  const tax = Math.round(SummaryTotal * 0.14);
-  const totalAmount = SummaryTotal + shipping + tax;
-  saveOrderToFirestore(cartItems, totalAmount,orderNumber);
-}
-/*https://adel.dev/scripts/stripe.php*/
-async function stripeBackend(price) {
-  const baseUrl = `${window.location.protocol}//${window.location.host}`;
-  const response = await fetch("link", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      amount: price,
-      name: "Shop",
-      secertKey:
-        "sk_test_51RQNgAFaoF7ngClnfOgObwbnWTaeuRHAE6AqNz60eKVoSk54xHOYnVEC49vQzjMH7UlN0B2s7YuMpFiUQC9FRw0700uOZ8vnAm",
-      onSuccess: `${baseUrl}/payment/payment.html?status=success`,
-      onCancel: `${baseUrl}/payment/payment.html?status=failed`,
-    }),
-  });
-
-  const data = await response.json();
-  if (data.url) {
-    window.location.href = data.url;
-  } else {
-    alert("Error: " + data.error);
-  }
 }
 
-// Handling URL After Stripe Process to go to  Payment Page
-if (location.search.includes("status=success")) {
-  const newUrl =
-    window.location.protocol +
-    "//" +
-    window.location.host +
-    window.location.pathname;
-  window.history.replaceState({}, document.title, newUrl);
-  simulateOrderCompletion();
-  const contShopping = document.getElementById("continue-shopping");
-  console.log(contShopping);
-  contShopping.addEventListener("click", () => {
-    window.location.href = "index.html";
-  });
-}
+// Stripe Test Mode       card numbers
+// Success                          	4242 4242 4242 4242
+// Authentication required (3D Secure)	4000 0027 6000 3184
+// Declined	                            4000 0000 0000 9995
 
 /*====================================================================================*/
 let arrCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
@@ -218,6 +211,7 @@ let SummaryTotal = 0;
 
 function orderSummary() {
   const summaryContainer = document.querySelector(".cart-items");
+
   summaryContainer.innerHTML = "";
   arrCartItems.forEach((item) => {
     const itemHTML = `<div
@@ -247,6 +241,7 @@ function orderTotals() {
   const Shipping = 50;
   const tax = Math.round(SummaryTotal * 0.14);
   const orderTotal = document.querySelector(".order-totals");
+
   orderTotal.innerHTML = `<div class="summary-item">
                             <span>Subtotal</span>
                             <span>EGP ${SummaryTotal}</span>
@@ -267,5 +262,5 @@ function orderTotals() {
 
 orderSummary();
 orderTotals();
-/*====================================================================================*/
 
+/*====================================================================================*/

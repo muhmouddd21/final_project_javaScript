@@ -1,0 +1,116 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+.faq-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.faq-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.faq-header h1 {
+  color: #2c3e50;
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.faq-header p {
+  color: #7f8c8d;
+  font-size: 16px;
+}
+
+.faq-accordion {
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.faq-accordion-item {
+  background-color: #fff;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.faq-accordion-item:last-child {
+  border-bottom: none;
+}
+
+.faq-accordion-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 18px 20px;
+  background-color: #fff;
+  border: none;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.faq-accordion-button:hover {
+  background-color: #f1f1f1;
+}
+
+.faq-accordion-button:focus {
+  outline: none;
+}
+
+.faq-accordion-button::after {
+  content: "+";
+  font-size: 22px;
+  font-weight: 700;
+  color: #3498db;
+  transition: transform 0.3s ease;
+}
+
+.faq-accordion-button.active::after {
+  content: "−";
+  transform: rotate(180deg);
+}
+
+.faq-accordion-content {
+  max-height: 0;
+  padding: 0 20px;
+  overflow: hidden;
+  background-color: #fff;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.faq-accordion-content.active {
+  max-height: 1000px;
+  padding: 0 20px 20px;
+}
+
+@media (max-width: 768px) {
+  .faq-container {
+    padding: 15px;
+    margin: 20px auto;
+  }
+
+  .faq-header h1 {
+    font-size: 24px;
+  }
+
+  .faq-accordion-button {
+    padding: 15px;
+    font-size: 15px;
+  }
+}
