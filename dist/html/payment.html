@@ -21,13 +21,14 @@
       rel="stylesheet"
     />
 
-
     <link rel="stylesheet" href="../style/global.css" />
     <link rel="stylesheet" href="../style/payment.css" />
+    <link rel="stylesheet" href="../style/navbar.css" />
+    <link rel="stylesheet" href="../style/footer.css" />
 
   </head>
   <body>
-    <div class="container payment-container">
+     <div class="container payment-container">
       <header class="text-center mb-4">
         <h2 class="mb-1">Checkout</h2>
         <p class="text-muted">Complete your purchase</p>
@@ -201,66 +202,61 @@
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-header">
-              <h5 class="mb-0">Payment Method</h5>
-            </div>
-            <div class="card-body">
-              <div class="secure-badge">
-                <i class="fas fa-lock me-2"></i> All transactions are secure and
-                encrypted
-              </div>
-
-              <div class="payment-option selected" data-payment="cod">
-                <div class="d-flex align-items-center">
-                  <input
-                    type="radio"
-                    name="payment"
-                    id="cod"
-                    value="cod"
-                    checked
-                    class="me-2"
-                  />
-                  <label
-                    for="cod"
-                    class="mb-0 d-flex align-items-center flex-grow-1"
-                  >
-                    <i class="fas fa-money-bill-wave payment-icon"></i>
-                    <div>
-                      <strong>Cash on Delivery (COD)</strong>
-                      <p class="text-muted mb-0 small">
-                        Pay when you receive your order
-                      </p>
+         <!-- Payment Options -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Payment Method</h5>
                     </div>
-                  </label>
-                </div>
-              </div>
-
-              <div class="payment-option" data-payment="stripe2">
-                <div class="d-flex align-items-center">
-                  <input
-                    type="radio"
-                    name="payment"
-                    id="stripe2"
-                    value="strip2"
-                    class="me-2"
-                  />
-                  <label
-                    for="strip2"
-                    class="mb-0 d-flex align-items-center flex-grow-1"
-                  >
-                    <i class="fas fa-money-bill-wave payment-icon"></i>
-                    <div>
-                      <strong>Pay with card</strong>
-                      <p class="text-muted mb-0 small">
-                        Pay when you receive your order
-                      </p>
+                    <div class="card-body">
+                        <div class="secure-badge">
+                            <i class="fas fa-lock me-2"></i> All transactions are secure and encrypted
+                        </div>
+                        
+                        <div class="payment-option selected" data-payment="cod">
+                            <div class="d-flex align-items-center">
+                                <input type="radio" name="payment" id="cod" value="cod" checked class="me-2">
+                                <label for="cod" class="mb-0 d-flex align-items-center flex-grow-1">
+                                    <i class="fas fa-money-bill-wave payment-icon"></i>
+                                    <div>
+                                        <strong>Cash on Delivery (COD)</strong>
+                                        <p class="text-muted mb-0 small">Pay when you receive your order</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-option" data-payment="stripe">
+                            <div class="d-flex align-items-center">
+                                <input type="radio" name="payment" id="stripe" value="stripe" class="me-2">
+                                <label for="stripe" class="mb-0 d-flex align-items-center flex-grow-1">
+                                    <i class="fas fa-credit-card payment-icon"></i>
+                                    <div>
+                                        <strong>Credit / Debit Card</strong>
+                                        <p class="text-muted mb-0 small">Pay securely with Stripe</p>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div id="stripe-details" class="mt-3" style="display: none;">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Card Information</label>
+                                        <div id="card-element" class="form-control" style="height: 40px; padding-top: 10px;">
+                                            <!-- Stripe Card Element will be inserted here -->
+                                        </div>
+                                        <div id="card-errors" class="invalid-feedback" style="display: none;"></div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="cardName" placeholder="Name on Card">
+                                            <label for="cardName">Name on Card</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </label>
                 </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- Right Column - Order Summary -->
@@ -286,7 +282,7 @@
           </div>
         </div>
       </div>
-
+           <!-- Order Success Message -->
       <div class="card order-success" id="order-success">
         <div class="success-icon">
           <i class="fas fa-check-circle"></i>
@@ -306,8 +302,12 @@
         <button class="btn btn-primary" id="continue-shopping" onclick="window.location.href='index.html'">Continue Shopping</button>
       </div>
     </div>
+    <div id="footer-container"></div>
+    <script src="../js/loadHeaderFooter.js"></script>
+
     <script src="https://js.stripe.com/v3/"></script>
     <script type="module" src="../js/payment.js"></script>
+    
   </body>
 </html>
 
