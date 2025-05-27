@@ -121,18 +121,20 @@ header {
   letter-spacing: 1px;
 }
 .button-primary {
-  background-color: rgb(197, 132, 10);
+  background-color: var(--accent);
   color: var(--light-text);
   border: none;
+  text-decoration: none;
 }
 .button-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(255, 208, 107, 0.4);
+  box-shadow: 0 5px 15px var(--accent);
 }
 .button-secondary {
   background-color: transparent;
   color: var(--light-text);
   border: 2px solid var(--light-text);
+  text-decoration: none;
 }
 .button-secondary:hover {
   background-color: var(--light-text);
@@ -232,10 +234,10 @@ header {
 }
 
 /* Start offer section */
-.offers .carousel,
+/* .offers .carousel,
 .offers .carousel img {
   height: 30rem;
-}
+} */
 /*Scroll to top button  */
 .up {
   position: fixed;
