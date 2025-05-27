@@ -189,7 +189,11 @@ async function saveOrderToFirestore(cartItems, totalAmount, orderId) {
             const today = new Date();
             const deliveryDate = new Date(today);
             deliveryDate.setDate(today.getDate() + Math.floor(7 + Math.random() * 3));
-            
+            const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+            const shipping = 50;
+            const tax = Math.round(SummaryTotal * 0.14);
+            const totalAmount = SummaryTotal + shipping + tax;
+            saveOrderToFirestore(cartItems, totalAmount, orderNumber);
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('delivery-date').textContent = deliveryDate.toLocaleDateString('en-US', options);
         }
